@@ -338,3 +338,19 @@ textarea { display: block; width: 100%; margin-top: 6px; font: inherit; border: 
 .node.next .halo { fill: #F2B705; opacity: .5; }
 .legend .ln { border-top: 3px solid #5B7FC0; }
 .legend .ln.next { border-top: 5px dashed #F2B705; box-shadow: 0 -1px 0 #172031 inset; }
+/* trip view: highlight the selected stop */
+#trail .stop .trailstop { transition: r .2s; }
+#trail .stop.cur .trailstop { r: 17; fill: #F2B705; stroke: #172031; stroke-width: 2; }
+#trail .stop.cur .trailnum { fill: #172031; font-size: 14px; }
+.timeline li { cursor: pointer; border-radius: 0 10px 10px 0; }
+.timeline li:hover, .timeline li.cur { background: #FFF6D6; }
+@media (max-width: 720px) {
+  .screen.game:has(.panel.trip-panel:not([hidden])) .trip-banner { display: none; }
+  .screen.game:has(.panel.trip-panel:not([hidden])) .mapwrap { padding-bottom: 44svh; overflow: hidden; place-items: start center; }
+  .screen.game:has(.panel.trip-panel:not([hidden])) #map { width: 100%; height: auto; }
+  .panel.trip-panel { max-height: 44svh; padding-top: 10px; }
+  .trip-panel h2 { font-size: 1.1rem; margin-bottom: .2em; }
+  .trip-panel > .muted:not(.tl-hint) { display: none; }
+  .trip-panel .area-chip { font-size: .75rem; }
+}
+@media (min-width: 721px) { .tl-hint { display: none; } }

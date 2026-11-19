@@ -5,7 +5,7 @@ import { GEO } from './geo.js';
 const NS = 'http://www.w3.org/2000/svg';
 
 // Lugano drawn from OpenStreetMap data (geo.js): the real lake shore, woods,
-// built-up areas, parks, railway and main roads, north up, about 170 px per km.
+// built-up areas, parks, railway and main roads, north up, about 240 px per km.
 // The steps sit near their real places, nudged apart where the centre is dense.
 export function baseMap() {
   return `
@@ -20,9 +20,9 @@ export function baseMap() {
   <g clip-path="url(#frame)">
     <rect x="230" y="18" width="762" height="584" fill="#EDF1E4"/>
     <!-- relief: San Salvatore, Monte Brè and the Boglia slopes -->
-    <ellipse cx="432" cy="540" rx="120" ry="90" fill="url(#hill)"/>
-    <ellipse cx="945" cy="140" rx="150" ry="110" fill="url(#hill)"/>
-    <ellipse cx="990" cy="40" rx="140" ry="70" fill="url(#hill)"/>
+    <ellipse cx="1000" cy="230" rx="170" ry="170" fill="url(#hill)"/>
+    <ellipse cx="900" cy="20" rx="200" ry="80" fill="url(#hill)"/>
+    <ellipse cx="240" cy="600" rx="130" ry="110" fill="url(#hill)"/>
     <path d="${GEO.wood}" fill="#CFE0BF"/>
     <path d="${GEO.town}" fill="#E4E1D8"/>
     <path d="${GEO.park}" fill="#C4DDB0"/>
@@ -30,11 +30,9 @@ export function baseMap() {
     <path d="${GEO.river}" fill="none" stroke="#8EC1E1" stroke-width="3" stroke-linecap="round"/>
     <path d="${GEO.roads}" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
     <path d="${GEO.rail}" fill="none" stroke="#7D838D" stroke-width="2" stroke-dasharray="6 3"/>
-    <g class="peak"><path d="M422 547 l7 -12 l7 12 z"/></g>
-    <text x="440" y="572" class="maplabel soft" text-anchor="middle">Monte San Salvatore</text>
-    <text x="388" y="505" class="maplabel soft" text-anchor="middle">Paradiso</text>
-    <text x="830" y="282" class="maplabel soft" text-anchor="middle">Castagnola</text>
-    <text x="660" y="440" class="maplabel lakelabel" text-anchor="middle">Lago di Lugano</text>
+    <text x="452" y="590" class="maplabel soft" text-anchor="middle">↙ Paradiso, San Salvatore</text>
+    <text x="900" y="400" class="maplabel soft" text-anchor="middle">Castagnola</text>
+    <text x="700" y="540" class="maplabel lakelabel" text-anchor="middle">Lago di Lugano</text>
     <text x="986" y="596" class="osm" text-anchor="end">© OpenStreetMap contributors</text>
   </g>
   <rect x="230" y="18" width="762" height="584" rx="18" fill="none" stroke="#C9D3DF" stroke-width="1.5"/>
@@ -43,7 +41,7 @@ export function baseMap() {
   <text x="113" y="76" class="maplabel region" text-anchor="middle">Home</text>
   <text x="113" y="560" class="maplabel soft" text-anchor="middle">before departure</text>
   <!-- the journey from home -->
-  <path d="M208 150 C290 150 330 190 392 200" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
+  <path d="M208 150 C270 160 300 290 330 326" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
   <g id="edges"></g>
   <g id="trail"></g>
   <g id="nodes"></g>
@@ -143,8 +141,10 @@ export function drawTrail(svg, path, who) {
   });
   g.appendChild(el('path', { d: pts.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' '), class: 'trail' }));
   pts.forEach((p, i) => {
-    g.appendChild(el('circle', { cx: p.x, cy: p.y, r: 11, class: 'trailstop' }));
-    g.appendChild(el('text', { x: p.x, y: p.y + 4, 'text-anchor': 'middle', class: 'trailnum' }, i + 1));
+    const stop = el('g', { class: 'stop', 'data-i': i, transform: `translate(${p.x} ${p.y})` });
+    stop.appendChild(el('circle', { r: 11, class: 'trailstop' }));
+    stop.appendChild(el('text', { y: 4, 'text-anchor': 'middle', class: 'trailnum' }, i + 1));
+    g.appendChild(stop);
   });
   if (who) {
     const end = PLACES[path[path.length - 1]];

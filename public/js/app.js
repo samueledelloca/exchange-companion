@@ -620,11 +620,42 @@ function viewTrip(t) {
   panel.style.setProperty('--area', '#172031');
   panel.innerHTML = `<div class="panel-head"><span class="area-chip">👀 ${named ? t.who : 'A past student'}, ${t.profile}</span><button class="x" id="pClose" aria-label="Close">×</button></div>
     <h2>${named ? `${t.who}'s` : 'Their'} trip</h2><p class="muted">${t.story}</p>
-    <ol class="timeline">${steps.map(([id, mood, note]) => { const st = byId(id); return `<li class="${mood}"><span class="tl-place">${PLACES[st.place].icon} ${PLACES[st.place].label}</span><b>${st.title}</b><span>${note}</span></li>`; }).join('')}</ol>
+    <p class="muted small tl-hint">Tap a step to see it on the map.</p>
+    <ol class="timeline">${steps.map(([id, mood, note], i) => { const st = byId(id); return `<li class="${mood}" data-i="${i}" tabindex="0"><span class="tl-place">${PLACES[st.place].icon} ${PLACES[st.place].label}</span><b>${st.title}</b><span>${note}</span></li>`; }).join('')}</ol>
     <div class="choices"><button class="btn primary" id="backMine">Back to my map</button></div>`;
-  const back = () => { drawTrail($('#map'), null); ban.hidden = true; panel.hidden = true; log('trip_hide'); redraw(); };
+  const back = () => { drawTrail($('#map'), null); ban.hidden = true; panel.hidden = true; zoomMap(null); log('trip_hide'); redraw(); };
   $('#hideTrip').onclick = back; $('#backMine').onclick = back; $('#pClose').onclick = back;
+  // Tap a step: highlight its stop on the trail and bring it into view (phones scroll the map).
+  const show = i => {
+    const st = byId(steps[i][0]);
+    document.querySelectorAll('#trail .cur').forEach(n => n.classList.remove('cur'));
+    document.querySelectorAll(`#trail [data-i="${i}"]`).forEach(n => n.classList.add('cur'));
+    panel.querySelectorAll('.timeline li').forEach(li => li.classList.toggle('cur', li.dataset.i === String(i)));
+    if (innerWidth <= 720) zoomMap(PLACES[st.place].x, PLACES[st.place].y);
+    log('trip_step', { trip: t.who, i });
+  };
+  panel.querySelectorAll('.timeline li').forEach(li => {
+    li.onclick = () => show(Number(li.dataset.i));
+    li.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(Number(li.dataset.i)); } };
+  });
+  setTimeout(() => show(0), 50);
   $('#backMine').focus({ preventScroll: true });
+}
+
+// Phones: zoom the map to twice the size around a point (animated viewBox); null resets.
+let zoomAnim;
+function zoomMap(x, y) {
+  const svg = $('#map'); if (!svg) return;
+  const from = svg.getAttribute('viewBox').split(' ').map(Number);
+  const to = x === null ? [0, 0, 1000, 620] : [Math.min(Math.max(x - 250, 0), 500), Math.min(Math.max(y - 155, 0), 310), 500, 310];
+  cancelAnimationFrame(zoomAnim);
+  const t0 = performance.now();
+  const step = now => {
+    const k = Math.min(1, (now - t0) / 350), e = k * (2 - k);
+    svg.setAttribute('viewBox', from.map((v, i) => v + (to[i] - v) * e).join(' '));
+    if (k < 1) zoomAnim = requestAnimationFrame(step);
+  };
+  zoomAnim = requestAnimationFrame(step);
 }
 
 function openCosts() {

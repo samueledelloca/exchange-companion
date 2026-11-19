@@ -1,5 +1,6 @@
 // Study configuration. Edit here, not in the engine.
 export const CONFIG = {
+  VERSION: 'dev', // replaced by scripts/deploy.sh; recorded in every session
   // Where the anonymous session log is POSTed. Relative, so it works under any
   // path prefix (e.g. /exchange-companion/). server.py records it as JSON Lines.
   // Empty string = no sending (the end screen offers a download instead).

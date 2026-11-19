@@ -14,7 +14,7 @@ on a laptop and on Cloudflare. Recordings live in the D1 database `exchange-comp
 
 ```bash
 npx wrangler login                                   # once, opens the browser
-npx wrangler pages deploy --branch main --commit-dirty=true
+./scripts/deploy.sh          # tags CSS/JS with a version, so old phone tabs reload
 ```
 
 Before each test round, set `STUDY_ROUND` in `public/js/config.js`

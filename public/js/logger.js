@@ -6,6 +6,7 @@ const t0 = performance.now();
 export const session = {
   id: (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)),
   round: CONFIG.STUDY_ROUND,
+  version: CONFIG.VERSION,
   startedAt: new Date().toISOString(),
   userAgent: navigator.userAgent.includes('Mobi') ? 'mobile' : 'desktop',
   screen: `${window.innerWidth}x${window.innerHeight}`,
