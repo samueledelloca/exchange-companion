@@ -302,9 +302,12 @@ function tutorial() {
   // Put the card next to the element it talks about, with an arrow pointing to it.
   const place = target => {
     const card = ov.querySelector('.tour-card');
-    const vw = innerWidth, vh = innerHeight, cw = card.offsetWidth, ch = card.offsetHeight;
-    const bottomCentre = () => { card.style.left = `${(vw - cw) / 2}px`; card.style.top = `${vh - ch - 16}px`; };
-    if (!target || vw <= 720) return bottomCentre();
+    // visualViewport excludes the browser toolbars (iOS Safari and Chrome).
+    const vw = innerWidth, vh = window.visualViewport?.height || innerHeight, cw = card.offsetWidth, ch = card.offsetHeight;
+    const bottomCentre = () => { card.style.left = `${(vw - cw) / 2}px`; card.style.top = `${Math.max(12, vh - ch - 16)}px`; };
+    // On phones the bottom belongs to the browser toolbar: put the card under the top bar.
+    if (vw <= 720) { card.style.left = `${(vw - cw) / 2}px`; card.style.top = `${($('.topbar')?.getBoundingClientRect().bottom || 0) + 10}px`; return; }
+    if (!target) return bottomCentre();
     const r = target.getBoundingClientRect();
     if (r.height > vh * 0.5) return bottomCentre();
     let top;
