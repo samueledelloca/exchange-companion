@@ -1,0 +1,8 @@
+name = "exchange-companion"
+pages_build_output_dir = "public"
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "exchange-companion"
+database_id = "3a7c43e8-0550-4fbe-a9a2-9f6b8a843c82"
