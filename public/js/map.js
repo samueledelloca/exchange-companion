@@ -74,10 +74,14 @@ export function drawMap(svg, steps, state, visible, onOpen) {
       const fromDone = state.steps[r]?.status === 'done';
       const toStatus = state.steps[st.id]?.status;
       // walked (done), suggested next by the companion, available, or locked
+      // A path is open only when its destination can really be done now.
+      const reachable = fromDone && ['open', 'action', 'later'].includes(toStatus);
       const cls = toStatus === 'done' ? 'edge done'
-        : fromDone && state.next === st.id ? 'edge next'
-        : fromDone ? 'edge avail' : 'edge locked';
-      edges.appendChild(el('path', { d: `M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`, class: cls }));
+        : reachable && state.next === st.id ? 'edge next'
+        : reachable ? 'edge avail' : 'edge locked';
+      const d = `M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`;
+      if (cls === 'edge next') edges.appendChild(el('path', { d, class: 'edge casing' }));
+      edges.appendChild(el('path', { d, class: cls }));
     }
   }
   for (const st of vis) {
@@ -111,6 +115,8 @@ export function drawMap(svg, steps, state, visible, onOpen) {
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(st.id); } });
     nodes.appendChild(g);
   }
+  // keep the suggested place (and its flag) above its neighbours
+  const nx = nodes.querySelector('.node.next'); if (nx) nodes.appendChild(nx);
 }
 
 export function drawAvatar(svg, placeId, flag) {

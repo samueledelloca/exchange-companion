@@ -327,3 +327,14 @@ textarea { display: block; width: 100%; margin-top: 6px; font: inherit; border: 
 @media (min-width: 721px) {
   .screen.game:has(.panel.trip-panel:not([hidden])) .trip-banner { left: 16px; transform: none; width: min(560px, calc(100% - 480px)); }
 }
+
+/* suggested vs open: different hue, not only a different dash */
+.edge.avail { stroke: #5B7FC0; stroke-width: 3; opacity: .7; stroke-dasharray: none; }
+.edge.casing { stroke: #172031; stroke-width: 9; opacity: .55; }
+.edge.next { stroke: #F2B705; stroke-width: 6; stroke-dasharray: 12 8; opacity: 1; animation: march 1s linear infinite; }
+.nextflag rect { fill: #F2B705; stroke: #172031; stroke-width: 1.5; }
+.nextflag text { fill: #172031; }
+.node.next .disc { stroke-width: 6; }
+.node.next .halo { fill: #F2B705; opacity: .5; }
+.legend .ln { border-top: 3px solid #5B7FC0; }
+.legend .ln.next { border-top: 5px dashed #F2B705; box-shadow: 0 -1px 0 #172031 inset; }
