@@ -521,6 +521,16 @@ function finishStep(id, res) {
   const paid = s.costs.slice(costsAtOpen ?? s.costs.length);
   costsAtOpen = null;
   // outcome panel
+  // When a step starts waiting, show its status message right away (rich or bare,
+  // the within-run variant) with the one-tap question, so every run is exposed to it.
+  let waitBox = '';
+  if (status === 'waiting' && st.scenes.waiting) {
+    const sc = st.scenes.waiting(ctx), style = s.statusStyle[id] || 'rich';
+    log('status_view', { step: id, style, where: 'outcome' });
+    waitBox = `<div class="statusbox ${style}">⏳ ${style === 'rich' ? sc.rich : sc.bare}</div>
+      <div class="microq" id="microq" data-step="${id}" data-style="${style}"><p>Do you know what to do next here?</p>
+      <button class="chipbtn" data-q="yes">Yes</button><button class="chipbtn" data-q="unsure">Not sure</button><button class="chipbtn" data-q="no">No</button></div>`;
+  }
   const meme = playful() && res.mood === 'win' && MEMES[id] && status === 'done';
   const support = res.mood === 'oops'
     ? (playful() ? `Ouch. ${res.note} Happens to a lot of students, we'll sort it.` : res.note)
@@ -530,6 +540,7 @@ function finishStep(id, res) {
     ${meme ? memeHtml(MEMES[id]) : ''}
     ${newStamps.map(a => `<div class="newstamp" style="--area:${AREAS[a].color}">${AREAS[a].stamp} <b>${AREAS[a].label}</b> stamp collected!</div>`).join('')}
     ${arrivals.map(a => `<div class="mail">📬 News about <b>${byId(a).title}</b>. Check it on the map.</div>`).join('')}
+    ${waitBox}
     ${paid.length ? `<div class="paid"><b>💸 This step cost you</b><ul>${paid.map(c => `<li class="${c.kind}"><span>${c.why}${c.kind === 'surprise' ? ' <em>surprise</em>' : ''}</span><b>${chf(c.chf)}</b></li>`).join('')}</ul></div>` : ''}
     ${passed > 0 ? `<div class="timepass">🗓️ ${fmtDays(passed)} went by. It is now <b>${weekLabel()}</b>.</div>` : ''}`;
   const nx = s.next && s.next !== id ? byId(s.next) : null;
@@ -538,6 +549,11 @@ function finishStep(id, res) {
     '<button class="btn ghost" id="backMap">Back to the map</button>'], status, 'outcome');
   if (nx) $('#goNext').onclick = () => { log('go_next', { from: id, to: nx.id }); openStep(nx.id); redraw(); };
   $('#backMap').onclick = closePanel;
+  document.querySelectorAll('#microq [data-q]').forEach(b => b.onclick = () => {
+    const box = $('#microq');
+    log('next_step_q', { step: box.dataset.step, style: box.dataset.style, answer: b.dataset.q, where: 'outcome' });
+    box.innerHTML = '<p class="muted">Thanks!</p>';
+  });
   if (meme) log('meme_shown', { step: id });
   redraw();
   if (newStamps.length) celebrate(newStamps);
