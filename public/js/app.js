@@ -192,7 +192,7 @@ function mapScreen() {
     <main class="mapwrap">
       <h1 class="sr-only">Your exchange map</h1>
       <svg id="map" viewBox="0 0 1000 620" role="group" aria-label="Map of your exchange">${baseMap()}</svg>
-      <div class="legend" aria-hidden="true"><span><i class="b done">✓</i>done</span><span><i class="b waiting">⏳</i>waiting</span><span><i class="b action">!</i>action needed</span><span><i class="b locked">🔒</i>locked</span></div>
+      <div class="legend" aria-hidden="true"><span><i class="ln next"></i>suggested next</span><span><i class="ln"></i>also open now</span><span><i class="ln done"></i>walked</span><span><i class="b done">✓</i>done</span><span><i class="b waiting">⏳</i>waiting</span><span><i class="b action">!</i>action needed</span><span><i class="b locked">🔒</i>locked</span></div>
       <div class="trip-banner" id="tripBanner" hidden></div>
     </main>
     <aside class="panel" id="panel" aria-live="polite" hidden></aside>
@@ -278,7 +278,7 @@ function hint(manual = false) {
   if (!st) return;
   const status = s.steps[st.id].status;
   const why = status === 'action' ? 'Something arrived for you.' : status === 'later' ? 'You postponed this one.' : '';
-  say(`${why} Next up: <b>${st.title}</b>${st.title.includes(PLACES[st.place].label) ? '' : ` at ${PLACES[st.place].label}`}. <button class="btn-link" data-go="${st.id}">Take me there</button>`, manual ? 9000 : 6000);
+  say(`${why} I suggest: <b>${st.title}</b>${st.title.includes(PLACES[st.place].label) ? '' : ` at ${PLACES[st.place].label}`}. <button class="btn-link" data-go="${st.id}">Take me there</button>`, manual ? 9000 : 6000);
   const go = $('#bubble [data-go]'); if (go) go.onclick = () => { $('#bubble').hidden = true; openStep(st.id); };
 }
 
@@ -287,7 +287,7 @@ function tutorial() {
   const first = s.next;
   const steps = [
     { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.` },
-    { sel: `[data-step="${first}"]`, text: 'Glowing places are steps you can do now. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
+    { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
     { sel: '.legend', text: 'Badges tell you the status: done, waiting for someone else, or action needed.' },
     { sel: '.hud', text: 'Keep an eye up here. The calendar moves on with every step. Your budget counts what the exchange costs you, and mistakes add surprises. Each finished area earns you a stamp.' },
     { sel: '#btn-steps', text: 'Prefer a list to a map? All your steps are here too.' },
@@ -534,7 +534,7 @@ function finishStep(id, res) {
     ${passed > 0 ? `<div class="timepass">🗓️ ${fmtDays(passed)} went by. It is now <b>${weekLabel()}</b>.</div>` : ''}`;
   const nx = s.next && s.next !== id ? byId(s.next) : null;
   panelHtml(st, body, [
-    nx ? `<button class="btn primary" id="goNext">Next: ${nx.title}</button>` : '',
+    nx ? `<button class="btn primary" id="goNext">Suggested next: ${nx.title}</button>` : '',
     '<button class="btn ghost" id="backMap">Back to the map</button>'], status, 'outcome');
   if (nx) $('#goNext').onclick = () => { log('go_next', { from: id, to: nx.id }); openStep(nx.id); redraw(); };
   $('#backMap').onclick = closePanel;
@@ -593,7 +593,7 @@ function openList() {
     </ul></section>`;
   }).join('');
   const nx = s.next ? byId(s.next) : null;
-  modal(`<h2>My steps</h2>${nx ? `<p class="next">Next up: <button class="btn-link" data-open="${nx.id}">${nx.title}</button></p>` : ''}${groups}`, 'My steps');
+  modal(`<h2>My steps</h2>${nx ? `<p class="next">Suggested next: <button class="btn-link" data-open="${nx.id}">${nx.title}</button></p>` : ''}${groups}`, 'My steps');
   document.querySelectorAll('#modal [data-open]').forEach(b => b.onclick = () => { log('list_pick', { step: b.dataset.open }); closeModal(); openStep(b.dataset.open); });
 }
 
@@ -602,17 +602,29 @@ function openTrips() {
   modal(`<h2>Others' trips</h2><p class="muted">Past students who chose to share their trip. Pick one to see it on the map.</p>
     <div class="trips">${TRIPS.map((t, i) => `<button class="trip" data-t="${i}"><b>${session.variant.tips === 'named' ? t.who : 'A past student'}</b><span class="muted">${t.profile}</span><span>${t.story}</span></button>`).join('')}</div>
     <p class="muted small">Example trips written for this prototype.</p>`, 'Others\' trips');
-  document.querySelectorAll('#modal [data-t]').forEach(b => b.onclick = () => {
-    const t = TRIPS[b.dataset.t];
-    log('trip_view', { trip: t.who });
-    closeModal();
-    const who = session.variant.tips === 'named' ? t.who : 'A past student';
-    drawTrail($('#map'), t.path, who);
-    const ban = $('#tripBanner');
-    ban.hidden = false;
-    ban.innerHTML = `<span>👀 <b>You are looking at ${who === 'A past student' ? 'a past student\'s' : `${who}'s`} trip, not yours.</b> ${t.story} Your own map is faded meanwhile.</span><button class="btn small" id="hideTrip">Back to my map</button>`;
-    $('#hideTrip').onclick = () => { drawTrail($('#map'), null); ban.hidden = true; log('trip_hide'); };
-  });
+  document.querySelectorAll('#modal [data-t]').forEach(b => b.onclick = () => viewTrip(TRIPS[b.dataset.t]));
+}
+
+// Another student's trip: numbered trail on the faded map, timeline in the panel.
+function viewTrip(t) {
+  log('trip_view', { trip: t.who });
+  closeModal();
+  const named = session.variant.tips === 'named';
+  const who = named ? t.who : 'A past student';
+  const steps = t.steps.filter(([id]) => byId(id));
+  drawTrail($('#map'), steps.map(([id]) => byId(id).place), who);
+  const ban = $('#tripBanner');
+  ban.hidden = false;
+  ban.innerHTML = `<span>👀 <b>You are looking at ${named ? `${t.who}'s` : 'a past student\'s'} trip, not yours.</b> Your own map is faded meanwhile.</span><button class="btn small" id="hideTrip">Back to my map</button>`;
+  const panel = $('#panel'); panel.hidden = false; panel.className = 'panel trip-panel';
+  panel.style.setProperty('--area', '#172031');
+  panel.innerHTML = `<div class="panel-head"><span class="area-chip">👀 ${named ? t.who : 'A past student'}, ${t.profile}</span><button class="x" id="pClose" aria-label="Close">×</button></div>
+    <h2>${named ? `${t.who}'s` : 'Their'} trip</h2><p class="muted">${t.story}</p>
+    <ol class="timeline">${steps.map(([id, mood, note]) => { const st = byId(id); return `<li class="${mood}"><span class="tl-place">${PLACES[st.place].icon} ${PLACES[st.place].label}</span><b>${st.title}</b><span>${note}</span></li>`; }).join('')}</ol>
+    <div class="choices"><button class="btn primary" id="backMine">Back to my map</button></div>`;
+  const back = () => { drawTrail($('#map'), null); ban.hidden = true; panel.hidden = true; log('trip_hide'); redraw(); };
+  $('#hideTrip').onclick = back; $('#backMine').onclick = back; $('#pClose').onclick = back;
+  $('#backMine').focus({ preventScroll: true });
 }
 
 function openCosts() {

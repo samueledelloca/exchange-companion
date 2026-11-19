@@ -23,17 +23,17 @@ export const PLACES = {
   laptop:    { x: 112, y: 150, label: 'Your desk at home',  icon: '💻' },
   embassy:   { x: 112, y: 300, label: 'Swiss embassy',      icon: '🛂' },
   mailbox0:  { x: 112, y: 450, label: 'USI Home portal',    icon: '📝' },
-  station:   { x: 420, y: 232, label: 'Lugano station',     icon: '🚉' },
-  campus:    { x: 560, y: 196, label: 'USI campus',         icon: '🎓' },
-  office:    { x: 676, y: 150, label: 'Exchange office',    icon: '📑' },
-  houses:    { x: 770, y: 262, label: 'Viganello & Molino Nuovo', icon: '🏘️' },
-  busstop:   { x: 640, y: 318, label: 'Bus stop',           icon: '🚌' },
-  municipio: { x: 506, y: 352, label: 'Punto Città',        icon: '🏛️' },
-  canton:    { x: 300, y: 330, label: 'Cantonal office',    icon: '🪪' },
-  post:      { x: 392, y: 362, label: 'Post office',        icon: '📮' },
-  home2:     { x: 790, y: 380, label: 'Your mailbox',       icon: '📬' },
-  lake:      { x: 600, y: 410, label: 'Lakefront',          icon: '🌅' },
-  viewpoint: { x: 912, y: 300, label: 'Monte Brè',          icon: '⛰️' },
+  station:   { x: 424, y: 205, label: 'Lugano station',     icon: '🚉' },
+  campus:    { x: 566, y: 112, label: 'USI campus',         icon: '🎓' },
+  office:    { x: 690, y: 96,  label: 'Exchange office',    icon: '📑' },
+  houses:    { x: 820, y: 60,  label: 'Viganello & Molino Nuovo', icon: '🏘️' },
+  busstop:   { x: 610, y: 176, label: 'Bus stop',           icon: '🚌' },
+  municipio: { x: 512, y: 252, label: 'Punto Città',        icon: '🏛️' },
+  canton:    { x: 300, y: 236, label: 'Cantonal office',    icon: '🪪' },
+  post:      { x: 476, y: 148, label: 'Post office',        icon: '📮' },
+  home2:     { x: 728, y: 206, label: 'Your mailbox',       icon: '📬' },
+  lake:      { x: 628, y: 262, label: 'Lakefront',          icon: '🌅' },
+  viewpoint: { x: 940, y: 122, label: 'Monte Brè',          icon: '⛰️' },
 };
 
 // Illustrative tips from past students. Names are invented; situations come
@@ -50,17 +50,66 @@ export const TIPS = {
   surprise: [{ who: 'Lena', when: 'Fall 2025', text: 'The Serafe fee is per household. Split it with your flatmates.' }],
 };
 
-// Other students' trips: illustrative journeys shown as trails on the map.
+// Other students' trips: complete illustrative journeys (written for the
+// prototype), step by step, in an order the dependencies allow. A step may
+// appear twice (sent back, or a waiting step that comes back).
 export const TRIPS = [
   { who: 'Lena', profile: 'EU, one semester, first time abroad',
-    path: ['laptop', 'mailbox0', 'houses', 'station', 'municipio', 'municipio', 'canton', 'busstop', 'viewpoint'],
-    story: 'Missed USI Home, found a sublet, went to Punto Città twice because of the owner\'s letter.' },
+    story: 'Missed USI Home, found a sublet, went to Punto Città twice because of the owner\'s letter.',
+    steps: [
+      ['accounts', 'win', 'Saved the username in a password manager.'],
+      ['usihome', 'oops', 'Thought registering interest was enough. USI Home was full.'],
+      ['roomhunt', 'win', 'Found a sublet in Viganello from an outgoing student.'],
+      ['courses', 'win', 'Learning agreement sent, no clashes.'],
+      ['arrive', 'win', 'Train through the Gotthard.'],
+      ['register', 'oops', 'Sent back: the owner\'s letter was missing.'],
+      ['register', 'win', 'Came back with the letter. Registered.'],
+      ['permit', 'meh', 'Submitted the form, then four weeks of silence.'],
+      ['insurance', 'win', 'Posted the exemption letter in week one.'],
+      ['transport', 'win', 'Bought a monthly student pass.'],
+      ['recognition', 'win', 'Learning agreement approved at once.'],
+      ['surprise', 'meh', 'Serafe bill, split with the flatmates.'],
+      ['permit', 'win', 'Letter arrived: biometrics done.'],
+      ['settled', 'win', 'Settled. Aperitivo on Monte Brè.'],
+    ] },
   { who: 'Ana', profile: 'Non-EU, one semester',
-    path: ['laptop', 'embassy', 'mailbox0', 'station', 'municipio', 'canton', 'post', 'office', 'viewpoint'],
-    story: 'Waited five weeks for the visa, got a room at USI Home, ran six procedures at once.' },
+    story: 'Waited five weeks for the visa, got a room at USI Home, ran six procedures at once.',
+    steps: [
+      ['accounts', 'win', 'Screenshot of the username, just in case.'],
+      ['visa', 'meh', 'Embassy in another city, then five weeks of waiting.'],
+      ['usihome', 'win', 'Applied the minute it opened and got a room.'],
+      ['courses', 'oops', 'Two courses on Tuesday at 10:30. Changed the plan.'],
+      ['visa', 'win', 'Visa collected.'],
+      ['arrive', 'win', 'Flight to Zurich, then the train.'],
+      ['register', 'win', 'Used the checklist. Registered at the first try.'],
+      ['insurance', 'win', 'Compared three student insurances, bought one online.'],
+      ['permit', 'meh', 'Submitted. Six procedures running at once.'],
+      ['transport', 'win', 'Asked which zones she needed.'],
+      ['recognition', 'oops', 'One course refused at home. Swapped it.'],
+      ['surprise', 'win', 'Serafe: USI Home pays it, nothing to do.'],
+      ['social', 'win', 'Welcome aperitivo at the lake.'],
+      ['permit', 'oops', 'The canton wanted proof of money. Sent the grant letter.'],
+      ['permit', 'win', 'Biometrics done.'],
+      ['settled', 'win', 'Settled.'],
+    ] },
   { who: 'Tomás', profile: 'EU, full year, studied abroad before',
-    path: ['laptop', 'mailbox0', 'houses', 'station', 'busstop', 'municipio', 'canton', 'lake', 'viewpoint'],
-    story: 'Confident about the paperwork, still got a bus fine and a surprise bill.' },
+    story: 'Confident about the paperwork, still got a bus fine and a surprise bill.',
+    steps: [
+      ['accounts', 'win', 'Password manager, as always.'],
+      ['usihome', 'oops', 'Applied on time, but no room was left.'],
+      ['roomhunt', 'meh', 'A listing asked for a deposit before any viewing. Walked away.'],
+      ['roomhunt', 'win', 'One-year lease in Molino Nuovo, right for a full year.'],
+      ['arrive', 'win', 'Drove down with family.'],
+      ['register', 'win', 'Registered at the first try.'],
+      ['courses', 'win', 'Study plan sent.'],
+      ['permit', 'meh', 'Submitted, then waited.'],
+      ['insurance', 'oops', 'Postponed the exemption letter. Posted it just in time.'],
+      ['transport', 'oops', 'Cheapest ticket, wrong zone: 90 CHF surcharge.'],
+      ['recognition', 'win', 'Approved.'],
+      ['surprise', 'oops', 'Ignored the Serafe bill. Paid a reminder fee.'],
+      ['permit', 'win', 'Biometrics done.'],
+      ['settled', 'win', 'Settled.'],
+    ] },
 ];
 
 // Ready-made characters (from the three personas of Interim Report 1).
@@ -237,7 +286,7 @@ export const STEPS = [
       start: c => ({
         text: `Bags packed. ${c.s.flags.housing ? 'Your room in Lugano is waiting.' : 'You still have no room in Lugano.'} How do you get there?`,
         why: true,
-        choices: [
+        choices: c.s.profile.origin === 'eu' ? [
           { id: 'train', label: 'Direct train through the Gotthard (about 130 CHF)', go: c => { c.spend(130, 'Train to Lugano'); c.days(1); c.set('travelNote', 'Six hours of mountains and tunnels, right on time.'); return 'arrived'; } },
           { id: 'flight', label: 'Cheapest flight to Milan, then the bus (about 110 CHF)', go: c => {
               c.spend(110, 'Flight and bus to Lugano'); c.days(1);
@@ -245,6 +294,13 @@ export const STEPS = [
               else c.set('travelNote', 'Cheap flight, bus on time. Lucky you.');
               return 'arrived'; } },
           { id: 'car', label: 'Drive down with family (fuel and vignette, about 90 CHF)', go: c => { c.spend(90, 'Fuel and motorway vignette'); c.days(1); c.set('travelNote', 'Your family carries the boxes and leaves you a full fridge.'); return 'arrived'; } },
+        ] : [
+          { id: 'zurich', label: 'Long-haul flight to Zurich, then the train (about 950 CHF)', go: c => { c.spend(950, 'Flight to Zurich and train to Lugano'); c.days(1); c.set('travelNote', 'Thirteen hours in the air and three on the train. Tired, but on time.'); return 'arrived'; } },
+          { id: 'milan', label: 'Cheaper long-haul flight to Milan, then the bus (about 800 CHF)', go: c => {
+              c.spend(800, 'Flight to Milan and bus to Lugano'); c.days(1);
+              if (c.rng() < 0.5) { c.cost(160, 'Taxi from Milan after a missed bus'); c.problem('missed-bus', 'random'); c.set('travelNote', 'The flight lands late and the last bus to Lugano has gone. Taxi: 160 CHF.'); }
+              else c.set('travelNote', 'Long flight, bus on time. Lucky you.');
+              return 'arrived'; } },
         ],
       }),
       arrived: c => ({

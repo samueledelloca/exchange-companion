@@ -1,72 +1,49 @@
 // The illustrated map: Lugano on the right, your home on the left.
 import { PLACES, AREAS } from './content.js';
+import { GEO } from './geo.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 
-// Stylised but faithful to the Gulf of Lugano, north up: the city on the north
-// shore of the bay, the station on the hill above it, San Salvatore on the
-// Paradiso peninsula to the south-west, Monte Brè above Castagnola to the east,
-// Campione d'Italia on the far shore and the lake running east to Gandria.
+// Lugano drawn from OpenStreetMap data (geo.js): the real lake shore, woods,
+// built-up areas, parks, railway and main roads, north up, about 170 px per km.
+// The steps sit near their real places, nudged apart where the centre is dense.
 export function baseMap() {
   return `
   <defs>
-    <linearGradient id="lakeG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#93C6E4"/><stop offset="1" stop-color="#5D9CC8"/>
-    </linearGradient>
-    <linearGradient id="landG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#DCE8D0"/><stop offset="1" stop-color="#EDF2E4"/>
-    </linearGradient>
-    <linearGradient id="mtG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9DB98F"/><stop offset="1" stop-color="#C4D6B6"/>
-    </linearGradient>
+    <radialGradient id="hill"><stop offset="0" stop-color="#9FBB8C" stop-opacity=".75"/><stop offset="1" stop-color="#9FBB8C" stop-opacity="0"/></radialGradient>
+    <clipPath id="frame"><rect x="230" y="18" width="762" height="584" rx="18"/></clipPath>
     <pattern id="rail" width="14" height="8" patternUnits="userSpaceOnUse">
       <rect width="14" height="8" fill="none"/><rect x="5" y="0" width="3" height="8" fill="#8A8F98"/>
     </pattern>
   </defs>
   <rect x="0" y="0" width="1000" height="620" fill="#EEF2F6"/>
-  <!-- land around the gulf -->
-  <path d="M228 18 H992 V602 H228 Z" fill="url(#landG)"/>
-  <!-- hills to the north (Monte Boglia ridge, Comano) -->
-  <path d="M228 110 C300 70 340 92 400 64 C460 38 520 80 590 52 C650 30 700 70 760 46 C820 24 880 60 992 40 V18 H228 Z" fill="#C9D9BC" opacity=".9"/>
-  <!-- the lake: the bay of Lugano opens south, the lake runs east to Gandria -->
-  <path class="lake" d="M404 602 C410 560 424 520 452 488 C476 460 506 440 546 432 C580 426 606 432 626 426
-    C660 418 700 432 744 446 C800 464 860 478 920 478 C952 478 976 474 992 470 V560
-    C960 560 920 556 880 560 C830 566 790 576 752 602 Z" fill="url(#lakeG)"/>
-  <!-- far shore: Campione d'Italia and the Sighignola slopes -->
-  <path d="M752 602 C790 576 830 566 880 560 C920 556 960 560 992 560 V602 Z" fill="#CFDDC2"/>
-  <text x="880" y="590" class="maplabel soft" text-anchor="middle">Campione d'Italia</text>
-  <g stroke="#fff" stroke-opacity=".55" stroke-width="2" fill="none" stroke-linecap="round">
-    <path d="M520 520 q12 -6 24 0 t24 0"/><path d="M640 500 q12 -6 24 0 t24 0"/><path d="M800 520 q12 -6 24 0 t24 0"/><path d="M470 570 q12 -6 24 0 t24 0"/>
+  <g clip-path="url(#frame)">
+    <rect x="230" y="18" width="762" height="584" fill="#EDF1E4"/>
+    <!-- relief: San Salvatore, Monte Brè and the Boglia slopes -->
+    <ellipse cx="432" cy="540" rx="120" ry="90" fill="url(#hill)"/>
+    <ellipse cx="945" cy="140" rx="150" ry="110" fill="url(#hill)"/>
+    <ellipse cx="990" cy="40" rx="140" ry="70" fill="url(#hill)"/>
+    <path d="${GEO.wood}" fill="#CFE0BF"/>
+    <path d="${GEO.town}" fill="#E4E1D8"/>
+    <path d="${GEO.park}" fill="#C4DDB0"/>
+    <path d="${GEO.lake}" fill="#8EC1E1" fill-rule="evenodd" stroke="#6FA8CF" stroke-width="1.5"/>
+    <path d="${GEO.river}" fill="none" stroke="#8EC1E1" stroke-width="3" stroke-linecap="round"/>
+    <path d="${GEO.roads}" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    <path d="${GEO.rail}" fill="none" stroke="#7D838D" stroke-width="2" stroke-dasharray="6 3"/>
+    <g class="peak"><path d="M422 547 l7 -12 l7 12 z"/></g>
+    <text x="440" y="572" class="maplabel soft" text-anchor="middle">Monte San Salvatore</text>
+    <text x="388" y="505" class="maplabel soft" text-anchor="middle">Paradiso</text>
+    <text x="830" y="282" class="maplabel soft" text-anchor="middle">Castagnola</text>
+    <text x="660" y="440" class="maplabel lakelabel" text-anchor="middle">Lago di Lugano</text>
+    <text x="986" y="596" class="osm" text-anchor="end">© OpenStreetMap contributors</text>
   </g>
-  <text x="640" y="560" class="maplabel lakelabel" text-anchor="middle">Lago di Lugano</text>
-  <!-- river Cassarate -->
-  <path d="M640 120 C632 200 650 260 628 330 C618 370 630 400 626 426" stroke="#8EC3E3" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <!-- San Salvatore, on the Paradiso peninsula -->
-  <path d="M262 600 C290 560 318 500 340 452 C346 440 354 440 360 452 C380 500 396 556 410 600 Z" fill="url(#mtG)"/>
-  <path d="M333 466 L340 452 C346 440 354 440 360 452 L366 466 L356 462 L350 470 L343 462 Z" fill="#fff" opacity=".8"/>
-  <text x="336" y="592" class="maplabel soft" text-anchor="middle">San Salvatore</text>
-  <text x="440" y="512" class="maplabel soft" text-anchor="middle">Paradiso</text>
-  <!-- Monte Brè, above Castagnola, falling into the lake -->
-  <path d="M800 452 C830 380 870 300 904 268 C914 258 922 258 932 268 C960 300 980 340 992 360 V470 C960 476 920 478 880 474 C850 470 824 462 800 452 Z" fill="url(#mtG)"/>
-  <text x="900" y="458" class="maplabel soft" text-anchor="middle">Castagnola</text>
-  <!-- old town and quarters -->
-  <g fill="#D3DBCB">
-    <rect x="452" y="300" width="22" height="16" rx="3"/><rect x="540" y="292" width="20" height="16" rx="3"/><rect x="470" y="404" width="26" height="16" rx="3"/>
-    <rect x="560" y="360" width="22" height="16" rx="3"/><rect x="700" y="214" width="22" height="16" rx="3"/><rect x="720" y="330" width="24" height="18" rx="3"/>
-    <rect x="600" y="248" width="20" height="16" rx="3"/><rect x="350" y="410" width="22" height="16" rx="3"/><rect x="420" y="440" width="20" height="14" rx="3"/>
-  </g>
-  <!-- palm trees on the lakefront (Riva, Parco Ciani) -->
-  <g class="palm"><path d="M540 436 v-24" stroke="#7A6A4F" stroke-width="3"/><path d="M540 412 q-14 -4 -20 6 M540 412 q14 -4 20 6 M540 412 q-6 -12 -16 -12 M540 412 q6 -12 16 -12" stroke="#4E9A4E" stroke-width="3" fill="none" stroke-linecap="round"/></g>
-  <g class="palm"><path d="M676 432 v-22" stroke="#7A6A4F" stroke-width="3"/><path d="M676 410 q-12 -4 -18 6 M676 410 q12 -4 18 6 M676 410 q-6 -10 -14 -10 M676 410 q6 -10 14 -10" stroke="#4E9A4E" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+  <rect x="230" y="18" width="762" height="584" rx="18" fill="none" stroke="#C9D3DF" stroke-width="1.5"/>
   <!-- home region -->
   <rect x="18" y="40" width="190" height="540" rx="22" fill="#E3E9F4" stroke="#B9C6DE" stroke-width="2" stroke-dasharray="6 6"/>
   <text x="113" y="76" class="maplabel region" text-anchor="middle">Home</text>
   <text x="113" y="560" class="maplabel soft" text-anchor="middle">before departure</text>
-  <text x="560" y="100" class="maplabel region" text-anchor="middle">Lugano</text>
-  <!-- railway from the north (Gotthard) into Lugano station -->
-  <path d="M208 150 C290 150 330 200 392 226" stroke="url(#rail)" stroke-width="8" fill="none"/>
-  <path d="M208 150 C290 150 330 200 392 226" stroke="#8A8F98" stroke-width="2" fill="none" transform="translate(0,-4)"/>
-  <path d="M208 150 C290 150 330 200 392 226" stroke="#8A8F98" stroke-width="2" fill="none" transform="translate(0,4)"/>
+  <!-- the journey from home -->
+  <path d="M208 150 C290 150 330 190 392 200" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
   <g id="edges"></g>
   <g id="trail"></g>
   <g id="nodes"></g>
@@ -95,7 +72,11 @@ export function drawMap(svg, steps, state, visible, onOpen) {
       const a = PLACES[from.place], b = PLACES[st.place];
       const mx = (a.x + b.x) / 2 + (b.y - a.y) * 0.12, my = (a.y + b.y) / 2 - (b.x - a.x) * 0.12;
       const fromDone = state.steps[r]?.status === 'done';
-      const cls = state.steps[st.id]?.status === 'done' ? 'edge done' : fromDone ? 'edge open' : 'edge locked';
+      const toStatus = state.steps[st.id]?.status;
+      // walked (done), suggested next by the companion, available, or locked
+      const cls = toStatus === 'done' ? 'edge done'
+        : fromDone && state.next === st.id ? 'edge next'
+        : fromDone ? 'edge avail' : 'edge locked';
       edges.appendChild(el('path', { d: `M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`, class: cls }));
     }
   }
@@ -120,6 +101,12 @@ export function drawMap(svg, steps, state, visible, onOpen) {
     }
     const label = el('text', { class: 'nlabel', 'text-anchor': 'middle', y: 46 }, p.label);
     g.appendChild(label);
+    if (state.next === st.id) {
+      const flag = el('g', { class: 'nextflag', transform: 'translate(0 -44)' });
+      flag.appendChild(el('rect', { x: -40, y: -12, width: 80, height: 22, rx: 11 }));
+      flag.appendChild(el('text', { 'text-anchor': 'middle', y: 4 }, 'Suggested'));
+      g.appendChild(flag);
+    }
     g.addEventListener('click', () => onOpen(st.id));
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(st.id); } });
     nodes.appendChild(g);
@@ -141,16 +128,21 @@ export function drawTrail(svg, path, who) {
   g.innerHTML = '';
   svg.classList.toggle('viewing-trip', !!path);
   if (!path) return;
-  const pts = path.map(id => PLACES[id]);
-  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x + (i % 2 ? 6 : -6)} ${p.y + (i % 2 ? 6 : -6)}`).join(' ');
-  g.appendChild(el('path', { d, class: 'trail' }));
+  // Repeated visits to the same place fan out so every number stays readable.
+  const seen = {};
+  const pts = path.map(id => {
+    const k = seen[id] = (seen[id] || 0) + 1, p = PLACES[id];
+    const ang = -Math.PI / 4 + (k - 1) * 1.1;
+    return { x: p.x + Math.cos(ang) * 20, y: p.y + Math.sin(ang) * 20 };
+  });
+  g.appendChild(el('path', { d: pts.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' '), class: 'trail' }));
   pts.forEach((p, i) => {
-    g.appendChild(el('circle', { cx: p.x + (i % 2 ? 6 : -6), cy: p.y + (i % 2 ? 6 : -6), r: 11, class: 'trailstop' }));
-    g.appendChild(el('text', { x: p.x + (i % 2 ? 6 : -6), y: p.y + (i % 2 ? 10 : -2), 'text-anchor': 'middle', class: 'trailnum' }, i + 1));
+    g.appendChild(el('circle', { cx: p.x, cy: p.y, r: 11, class: 'trailstop' }));
+    g.appendChild(el('text', { x: p.x, y: p.y + 4, 'text-anchor': 'middle', class: 'trailnum' }, i + 1));
   });
   if (who) {
-    const end = pts[pts.length - 1];
-    const tag = el('g', { class: 'trailtag', transform: `translate(${end.x} ${end.y - 62})` });
+    const end = PLACES[path[path.length - 1]];
+    const tag = el('g', { class: 'trailtag', transform: `translate(${Math.min(end.x, 900)} ${Math.max(end.y - 66, 34)})` });
     tag.appendChild(el('rect', { x: -60, y: -16, width: 120, height: 30, rx: 15 }));
     tag.appendChild(el('text', { 'text-anchor': 'middle', y: 5 }, `${who}'s trip`));
     g.appendChild(tag);
