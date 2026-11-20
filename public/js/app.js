@@ -750,7 +750,7 @@ function questionnaire() {
           <label><input type="radio" name="screen" value="student"> No, but I am or was a student</label>
           <label><input type="radio" name="screen" value="other"> No</label></fieldset>
         <fieldset class="about"><legend>About you (optional)</legend>
-          <label>Age range <select name="age"><option value="">Choose</option>${['18–24', '25–34', '35–44', '45–54', '55 or older', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
+          <label>Age range <select name="age"><option value="">Choose</option>${['18–24', '25–34', '35–44', '45–54', '55–64', '65 or older', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
           <label>Where did you mostly grow up? <select name="region"><option value="">Choose</option>${['Switzerland', 'Italy', 'Germany, Austria', 'France, Benelux', 'Other Western Europe', 'Eastern Europe', 'Latin America', 'North America', 'Asia', 'Middle East, North Africa', 'Sub-Saharan Africa', 'Oceania', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
           <label>What do you do? <select name="occupation"><option value="">Choose</option>${['Student', 'Working', 'Studying and working', 'Other', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
           <label>Field of study or work <select name="field"><option value="">Choose</option>${['Informatics, engineering', 'Economics, business, finance', 'Communication, media', 'Design, architecture, arts', 'Humanities, social sciences, education', 'Natural sciences, health, medicine', 'Law, political science', 'Other', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
