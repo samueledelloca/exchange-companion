@@ -17,8 +17,10 @@ npx wrangler login                                   # once, opens the browser
 ./scripts/deploy.sh          # tags CSS/JS with a version, so old phone tabs reload
 ```
 
-Before each test round, set `STUDY_ROUND` in `public/js/config.js`
-(`pilot-internal`, `class-2026-11-26`, `class-2026-12-02`, `online`) and publish again.
+The study round is set automatically from the date (Swiss time): `pre-class` before 26.11,
+`class-2026-11-26`, `class-2026-12-02`, and `online` on any other day after 26.11. For team
+tests add `?round=test` to the link. The 40 sessions recorded until 20.11.2026 were relabelled
+`test`.
 
 ## Get the data
 

@@ -1,6 +1,9 @@
 // The illustrated map: Lugano on the right, your home on the left.
 import { PLACES, AREAS, HOMES } from './content.js';
 import { GEO } from './geo.js';
+import { wasDragged } from './camera.js';
+
+let lastTouchOpen = 0;
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -137,7 +140,10 @@ export function drawMap(svg, steps, state, visible, onOpen) {
       flag.appendChild(el('text', { 'text-anchor': 'middle', y: 4 }, 'Suggested'));
       g.appendChild(flag);
     }
-    g.addEventListener('click', () => onOpen(st.id));
+    // Touch: open on finger-up (unless the finger moved), since some browsers do not
+    // turn a tap into a click after a pinch or a drag; the click that may follow is ignored.
+    g.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse' && !wasDragged()) { lastTouchOpen = performance.now(); onOpen(st.id); } });
+    g.addEventListener('click', () => { if (performance.now() - lastTouchOpen > 700) onOpen(st.id); });
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(st.id); } });
     nodes.appendChild(g);
   }

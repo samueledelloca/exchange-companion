@@ -186,3 +186,6 @@ export function deskReveal(x) {
   };
   deskAnim = requestAnimationFrame(step);
 }
+
+// For the map: was the last touch a drag or a pinch (then it must not open a place)?
+export const wasDragged = () => dragged;
