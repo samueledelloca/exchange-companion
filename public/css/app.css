@@ -409,10 +409,10 @@ html, body { overscroll-behavior-y: none; }
   .cele-card { padding: 16px 24px; } .cele-stamp { width: 84px; height: 84px; font-size: 2.4rem; }
 }
 
-/* desktop: the legend moves beside an open panel (the map slides, see camera.js) */
-@media (min-width: 721px) {
-  .legend { transition: right .25s ease; }
-  .screen.game:has(.panel:not([hidden])) .legend { right: calc(min(420px, 100% - 32px) + 32px); }
+/* desktop: the legend stays in its corner; the side panel ends just above it */
+@media (min-width: 721px) and (min-height: 501px), (min-width: 721px) and (pointer: fine) {
+  .panel:not(.trip-panel) { bottom: 66px; }
+  .panel.trip-panel { bottom: 66px; }
 }
 
 /* immersive map on phones: the map fills the screen, the rest floats over it */
@@ -481,3 +481,9 @@ html, body { overscroll-behavior-y: none; }
 .legendlist .ln.done { border-top-color: var(--win); }
 .legendlist .ln.lock { border-top: 3px dotted #9AA6B8; }
 #btn-trips.active { background: #172031; color: #fff; }
+button.chip.role { cursor: pointer; font: inherit; font-size: .9rem; font-weight: 600; }
+button.chip.role:hover { border-color: var(--accent); }
+.rolecard { display: flex; gap: 14px; align-items: center; margin-bottom: .4em; }
+.rolecard h2 { margin: 0; }
+.rolecard p { margin: 2px 0 0; }
+.role-flag { font-size: 2.6rem; line-height: 1; }

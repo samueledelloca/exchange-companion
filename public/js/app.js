@@ -200,7 +200,7 @@ function mapScreen() {
     <header class="topbar">
       <div class="brand">${buddySvg(30)}<span>Exchange Companion</span></div>
       <div class="hud">
-        <span class="chip role" title="The student you are playing">${s.profile.flag} <span class="rl">You play </span><b>${s.profile.preset === 'custom' ? 'your student' : s.profile.name}</b></span>
+        <button class="chip role" id="btn-role" title="Who you are playing: tap for details">${s.profile.flag} <span class="rl">You play </span><b>${s.profile.preset === 'custom' ? 'your student' : s.profile.name}</b></button>
         <span class="chip clock" title="Simulated time" aria-live="polite">📅 <span id="week"></span></span>
         <button class="chip costs" id="btn-costs" title="Your budget: open the breakdown">💸 <span id="cost"></span></button>
         <span class="stamps" id="stamps" aria-label="Area stamps"></span>
@@ -228,6 +228,7 @@ function mapScreen() {
   `, 'game');
   $('#btn-steps').onclick = openList;
   $('#btn-legend').onclick = openLegend;
+  $('#btn-role').onclick = openRole;
   $('#btn-trips').onclick = openTrips;
   $('#btn-end').onclick = confirmEnd;
   $('#btn-costs').onclick = openCosts;
@@ -721,6 +722,28 @@ function tripButton(back) {
 function zoomMap(x, y) {
   if (x === null) { lastFocus = null; return setTimeout(() => focusMap(true), 0); }
   follow(x, y, 320);
+}
+
+// The character card: who you play, their situation, and what it means for the path.
+function openRole() {
+  log('role_open');
+  const p = s.profile, preset = PRESETS.find(x => x.id === p.preset);
+  const eu = p.origin === 'eu', name = p.preset === 'custom' ? 'Your student' : p.name;
+  const housing = { usihome: 'a room at USI Home', lease: 'a one-year lease in Molino Nuovo', sublet: 'a sublet in Viganello' }[s.flags.housing];
+  const means = [
+    eu ? 'From the EU or EFTA: no visa needed.' : 'From outside the EU and EFTA: needs a Swiss visa before travelling.',
+    eu ? 'Can ask for an exemption from Swiss health insurance, with the European card.' : 'Needs a Swiss student health insurance.',
+    p.stay === 'semester' ? 'Stays one semester: one-year leases are a problem.' : 'Stays a full year: a one-year lease fits.',
+    p.abroad ? 'Has lived abroad before: knows some of the drill.' : 'First time living abroad.',
+  ];
+  modal(`<div class="rolecard"><span class="role-flag">${p.flag}</span><div><h2>${name}</h2>
+      <p class="muted">${preset ? preset.blurb : 'The student you made for this exchange.'}</p></div></div>
+    <h3>Their situation</h3><ul class="plain">${means.map(m => `<li>${m}</li>`).join('')}</ul>
+    <h3>So far</h3><ul class="plain">
+      <li>${housing ? `Housing: ${housing}.` : 'Housing: not sorted yet.'}</li>
+      <li>${s.flags.courses ? 'Study plan: sent.' : 'Study plan: not done yet.'}</li>
+      <li>Budget so far: ${chf(total())}${extra() ? `, of which ${chf(extra())} surprises` : ''}.</li></ul>
+    <p class="muted small">Decide as you think ${p.preset === 'custom' ? 'your student' : p.name} would.</p>`, 'Your character');
 }
 
 function openLegend() {

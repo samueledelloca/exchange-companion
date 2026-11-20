@@ -113,7 +113,7 @@ main event types are:
 `consent`, `profile`, `tutorial` (skipped, ms), `open_step`, `choice`, `multi`,
 `outcome` (end, mood, simulated day, totalCHF, surpriseCHF), `problem` (id, cause), `cost` (chf, why, kind planned or surprise), `costs_open`, `why`,
 `status_view` (where: status or outcome), `next_step_q`, `next_step_hint` (shown after a no or not sure), `waiting_action`, `tips_open`, `timetable_check`,
-`counter_card`, `quiz` (comprehension check at arrival: selected, correct), `list_open`, `list_pick`, `legend_open` (phones), `custom_open`, `trips_open`, `trip_view`, `trip_hide`, `meme_shown`,
+`counter_card`, `quiz` (comprehension check at arrival: selected, correct), `list_open`, `list_pick`, `legend_open` (phones), `custom_open`, `role_open` (character card), `trips_open`, `trip_view`, `trip_hide`, `meme_shown`,
 `viewport` (orientation change or large resize), `map_zoom` (how: pinch, doubletap), `map_pan` (phones; at most one per 2 s while gesturing), `buddy_click`, `buddy_dismiss`, `stamp`, `mail_arrived`, `end` (early, done/total, totalCHF, surpriseCHF, costs, problems with cause, forcedProblems), `share_trip`, `questionnaire`.
 
 If the server cannot be reached (for example the page is opened as a file), the thank-you
