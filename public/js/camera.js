@@ -11,7 +11,8 @@ let svg = null, cam = null, anim = 0, onLog = () => {};
 const pts = new Map();
 let gesture = null, dragged = false, lastTap = 0, logTimer = 0, pendingLog = null;
 
-export const isPhone = () => window.innerWidth <= 720;
+// Phones in portrait (narrow) and in landscape (short screen with touch).
+export const isPhone = () => window.innerWidth <= 720 || (window.innerHeight <= 500 && !!window.matchMedia?.('(pointer: coarse)').matches);
 
 function aspect() { return svg.clientWidth / Math.max(1, svg.clientHeight); }
 function hWhole() { return Math.max(MAP_H, MAP_W / aspect()); }
@@ -109,9 +110,9 @@ function up(e) {
 function buttons(host) {
   const box = document.createElement('div');
   box.className = 'mapctl';
-  box.innerHTML = `<button class="ctl" data-z="in" aria-label="Zoom in">+</button>
-    <button class="ctl" data-z="out" aria-label="Zoom out">−</button>
-    <button class="ctl wide" data-z="whole" aria-label="Show the whole map">Whole map</button>`;
+  box.innerHTML = `<div class="ctlgrp"><button class="ctl" data-z="in" aria-label="Zoom in" title="Zoom in">+</button>
+    <button class="ctl" data-z="out" aria-label="Zoom out" title="Zoom out">−</button></div>
+    <button class="ctl" data-z="whole" aria-label="Show the whole map" title="Whole map"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
   host.appendChild(box);
   box.querySelector('[data-z="in"]').onclick = () => { glide({ ...cam, h: cam.h * 0.65 }, 250); onLog('map_zoom', { how: 'button_in' }); };
   box.querySelector('[data-z="out"]').onclick = () => { glide({ ...cam, h: cam.h / 0.65 }, 250); onLog('map_zoom', { how: 'button_out' }); };
@@ -137,7 +138,8 @@ export function initCamera(el, host, log) {
 export function follow(x, y, h = H_FOLLOW) {
   if (!svg || !isPhone()) return;
   // keep a closer zoom if the participant chose one, otherwise come in to the readable zoom
-  glide({ cx: x, cy: y, h: Math.min(cam.h, h) });
+  // in landscape the screen is wide: also cap the visible width at about 640 map units
+  glide({ cx: x, cy: y, h: Math.min(cam.h, h, 640 / aspect()) });
 }
 
 export function whole() { if (svg && isPhone()) glide({ cx: MAP_W / 2, cy: MAP_H / 2, h: hWhole() }); }

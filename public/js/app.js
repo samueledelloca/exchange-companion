@@ -93,6 +93,7 @@ function intro() {
       <h1>Ciao! I'm ${BUDDY.name}, your exchange companion.</h1>
       <p class="lead">In the next 5 to 10 minutes you will play an exchange student coming to USI, in Lugano. You do the paperwork, find a room, pick courses and settle in, and I come along.</p>
       <p>Everything is simulated and simplified, but the problems along the way are ones real exchange students run into.</p>
+      ${isPhone() && innerHeight > innerWidth ? '<p class="muted small">📱↻ On a phone the map is wider if you turn it sideways.</p>' : ''}
       <button class="btn primary" id="go">Sounds good, what's next?</button>
     </main>`, 'center');
   $('#go').onclick = consent;
@@ -237,7 +238,7 @@ function redraw() {
   $('#week').textContent = weekLabel();
   if (shownDay !== null && s.day > shownDay) tickClock(s.day - shownDay);
   shownDay = s.day;
-  $('#cost').innerHTML = `<b>${chf(total())}</b> spent${extra() ? ` <span class="surp">incl. ${chf(extra())} surprises</span>` : ''}`;
+  $('#cost').innerHTML = `<b>${chf(total())}</b><span class="lbl"> spent</span>${extra() ? ` <span class="surp">incl. ${chf(extra())} surprises</span>` : ''}`;
   if (shownCost !== null && total() > shownCost) tickChip('.costs', `+${chf(total() - shownCost)}`);
   shownCost = total();
   $('#stamps').innerHTML = Object.entries(AREAS).map(([k, a]) => {
@@ -306,7 +307,7 @@ function hint(manual = false) {
 function tutorial() {
   const first = s.next;
   const steps = [
-    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch or use + and − to zoom, drag to move around.' : ''}` },
+    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch or use + and − to zoom, drag to move around.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
     { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
     { sel: '.legend', text: 'Badges tell you the status: done, waiting for someone else, or action needed.' },
     { sel: '.hud', text: 'Keep an eye up here. The calendar moves on with every step. Your budget counts what the exchange costs you, and mistakes add surprises. Each finished area earns you a stamp.' },
@@ -676,7 +677,7 @@ function viewTrip(t) {
     document.querySelectorAll('#trail .cur').forEach(n => n.classList.remove('cur'));
     document.querySelectorAll(`#trail [data-i="${i}"]`).forEach(n => n.classList.add('cur'));
     panel.querySelectorAll('.timeline li').forEach(li => li.classList.toggle('cur', li.dataset.i === String(i)));
-    if (innerWidth <= 720) zoomMap(PLACES[st.place].x, PLACES[st.place].y);
+    if (isPhone()) zoomMap(PLACES[st.place].x, PLACES[st.place].y);
     log('trip_step', { trip: t.who, i });
   };
   panel.querySelectorAll('.timeline li').forEach(li => {

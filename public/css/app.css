@@ -380,11 +380,43 @@ textarea { display: block; width: 100%; margin-top: 6px; font: inherit; border: 
 html, body { overscroll-behavior-y: none; }
 .actions.center { justify-content: center; }
 
-/* phone map controls */
+/* phone map controls: a compact map-style control in the corner of the map */
 .mapctl { display: none; }
-@media (max-width: 720px) {
-  .mapctl { display: flex; flex-direction: column; gap: 8px; position: absolute; right: 10px; top: 10px; z-index: 4; align-items: flex-end; }
-  .ctl { font: inherit; font-size: 1.4rem; font-weight: 800; width: 46px; height: 46px; border-radius: 14px; border: 1px solid #C9D2DF; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); cursor: pointer; }
-  .ctl.wide { width: auto; font-size: .85rem; padding: 0 12px; }
-  .ctl:active { transform: scale(.95); }
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .mapctl { display: flex; flex-direction: column; gap: 8px; position: absolute; right: 10px; top: 10px; z-index: 4; }
+  .ctlgrp { display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(23,32,49,.22); border: 1px solid rgba(23,32,49,.12); }
+  .ctl { font: inherit; font-size: 1.3rem; font-weight: 700; line-height: 1; width: 42px; height: 42px; display: grid; place-items: center; border: 0; background: rgba(255,255,255,.94); color: var(--ink); cursor: pointer; padding: 0; }
+  .ctlgrp .ctl + .ctl { border-top: 1px solid #D5DCE6; }
+  .mapctl > .ctl { border-radius: 12px; box-shadow: 0 2px 10px rgba(23,32,49,.22); border: 1px solid rgba(23,32,49,.12); }
+  .ctl:active { background: #E6EDFA; }
+}
+
+/* phones held sideways: compact top bar, full-height map, step panel as a side column */
+@media (max-height: 500px) and (pointer: coarse) and (min-width: 721px) {
+  .topbar { padding: 4px 10px; gap: 6px 10px; flex-wrap: nowrap; padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+  .brand span { display: none; }
+  .brand .buddy-svg { width: 26px; height: 26px; }
+  .hud { flex-wrap: nowrap; gap: 6px; min-width: 0; }
+  .chip { min-height: 30px; padding: 3px 9px; font-size: .78rem; white-space: nowrap; }
+  .costs .lbl, .costs .surp { display: none; }
+  .costs:has(.surp) b { color: var(--oops); }
+  .stamp { width: 26px; height: 26px; font-size: .8rem; }
+  .tools { gap: 6px; }
+  .btn.small { padding: 5px 10px; min-height: 34px; font-size: .82rem; }
+  .mapwrap { place-items: stretch; padding: 0; overflow: hidden; }
+  #map { width: 100%; height: 100%; min-width: 0; max-height: none; touch-action: none; }
+  .legend { display: none; }
+  .panel { top: 50px; bottom: 6px; right: max(6px, env(safe-area-inset-right)); width: min(380px, 46%); padding: 10px 14px 14px; border-radius: 16px; }
+  .panel h2 { font-size: 1.1rem; }
+  .panel .btn { padding: 9px 14px; min-height: 40px; }
+  .screen.game:has(.panel:not([hidden])) .mapctl { right: calc(min(380px, 46%) + 16px); }
+  .buddy-dock { left: max(10px, env(safe-area-inset-left)); bottom: 10px; max-width: 46%; }
+  .buddy-btn { width: 52px; height: 52px; } .buddy-btn .buddy-svg { width: 42px; height: 42px; }
+  .dock-bubble { font-size: .85rem; padding: 8px 34px 8px 12px; }
+  .trip-banner { display: none; }
+  .tour-card { width: min(420px, calc(100% - 32px)); padding: 12px 14px; }
+  .tour-card .buddy-row .buddy-svg { width: 40px; height: 40px; }
+  .tour-card p { font-size: .9rem; }
+  .modal-card { padding: 16px 18px; }
+  .cele-card { padding: 16px 24px; } .cele-stamp { width: 84px; height: 84px; font-size: 2.4rem; }
 }
