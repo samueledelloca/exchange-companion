@@ -30,6 +30,12 @@ tests add `?round=test` to the link. The 40 sessions recorded until 20.11.2026 w
 
 `sessions.csv` has one row per participant (variants, profile, totals, problems by cause,
 background, UEQ-S items and scale scores on -3..+3, tailored items, open answers);
+Without a Cloudflare login (a phone, a cloud session): `EXPORT_KEY=... ./scripts/fetch.sh [round]`,
+or open `https://exchange-companion.pages.dev/api/export?key=KEY` in a browser (`&file=events`
+for events, `&round=...` for one round). The key is the Pages secret `EXPORT_KEY`
+(`npx wrangler pages secret put EXPORT_KEY --project-name exchange-companion` to change it);
+a local copy is in `data/.export_key`. Wrong or missing key gives 404.
+
 `events.csv` has one row per event with the details as JSON. For local server data run
 `python3 scripts/to_csv.py`. `data/` is git-ignored: recordings never go to the repository.
 
