@@ -157,7 +157,7 @@ export const MEMES = {
 // 2026 estimates for the simulation, to be checked by the group: USI Home
 // about 650 CHF/month, private rooms 650-700, deposit up to 3 months on a lease,
 // train from Germany about 130, Swiss national visa about 80, permit and
-// biometrics about 100, Swisscare-type student insurance 80-95 CHF/month,
+// biometrics: 0 (three exchange students in our group paid nothing, 2026), Swisscare-type student insurance 80-95 CHF/month,
 // Arcobaleno student monthly pass about 55, surcharge for a partially valid
 // ticket (wrong zones) about 75 plus the fare (75 in Zurich, 105 in Lausanne; Ticino not found), taxi
 // Malpensa-Lugano about 160, Serafe 335 a year per household.
@@ -198,7 +198,7 @@ export const STEPS = [
   },
   {
     id: 'visa', area: 'prep', place: 'embassy', title: 'Get your Swiss visa', mandatory: true,
-    requires: ['accounts'], when: s => s.profile.origin === 'noneu', waitSteps: 2,
+    requires: ['accounts'], when: s => s.profile.origin === 'noneu' && s.profile.visa !== false, waitSteps: 2,
     scenes: {
       start: () => ({
         text: 'As a non-EU student you need a Swiss visa before you travel. The embassy is in another city and the process can take weeks.',
@@ -432,7 +432,7 @@ export const STEPS = [
         };
         return {
           text: '📬 A letter from the canton: book your biometrics appointment (photo and fingerprints).',
-          choices: [{ id: 'book', label: 'Book and go to the appointment (fees about 100 CHF)', go: c => { c.spend(100, 'Permit and biometrics fees'); c.days(3); return { end: 'done', mood: 'win', note: 'Biometrics done. Your permit card will follow by post.' }; } }],
+          choices: [{ id: 'book', label: 'Book and go to the appointment', go: c => { c.days(3); return { end: 'done', mood: 'win', note: 'Biometrics done. Your permit card will follow by post.' }; } }],
         };
       },
       suspended: () => ({

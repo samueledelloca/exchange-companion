@@ -59,8 +59,8 @@ the class session.**
 
 - **Map and paths.** Dependencies made visible (no address, no registration).
 - **Personalisation.** Three personas from Report 1, or a custom student (EU or not,
-  semester or year, first time abroad or not). Non-EU students get the visa step and no
-  insurance exemption. Students who lived abroad skip one tutorial card.
+  semester or year, first time abroad or not). Non-EU students get the visa step (unless they choose
+  the no-visa option, e.g. Singapore) and no insurance exemption. Students who lived abroad skip one tutorial card.
 - **Companion.** Intro, tutorial (skippable), next-step hints, reactions after each step.
   Jokes only after good outcomes. After a problem it is supportive in both variants.
 - **Critical scenarios.** A scam listing, missing documents at Punto Città, an

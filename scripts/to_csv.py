@@ -59,7 +59,7 @@ for r in sessions:
         'orientation_changes': sum(e['type'] == 'viewport' for e in ev),
         'buddy': v.get('buddy', ''), 'tips': v.get('tips', ''), 'seed': v.get('seed', ''),
         'status_style': json.dumps(v.get('statusStyle', {})),
-        'persona': prof.get('preset', ''), 'origin': prof.get('origin', ''), 'stay': prof.get('stay', ''), 'abroad_before': prof.get('abroad', ''),
+        'persona': prof.get('preset', ''), 'origin': prof.get('origin', ''), 'visa_needed': prof.get('visa', ''), 'stay': prof.get('stay', ''), 'abroad_before': prof.get('abroad', ''),
         'tutorial_skipped': tut.get('skipped', ''), 'tutorial_s': round(tut['ms'] / 1000, 1) if 'ms' in tut else '',
         'reached_end': bool(end), 'ended_early': end.get('early', ''), 'questionnaire_sent': bool(a),
         'steps_done': end.get('done', ''), 'steps_total': end.get('total', ''), 'sim_day': end.get('day', ''),

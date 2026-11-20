@@ -142,7 +142,8 @@ function profile() {
         <form id="ownForm" hidden>
           <fieldset><legend>Where are you from?</legend>
             <label><input type="radio" name="origin" value="eu" checked> EU or EFTA country</label>
-            <label><input type="radio" name="origin" value="noneu"> Outside the EU and EFTA</label></fieldset>
+            <label><input type="radio" name="origin" value="noneu"> Outside the EU and EFTA, I need a visa</label>
+            <label><input type="radio" name="origin" value="noneu-novisa"> Outside the EU and EFTA, no visa needed (for example Singapore, Japan, Australia, UK)</label></fieldset>
           <fieldset><legend>How long do you stay?</legend>
             <label><input type="radio" name="stay" value="semester" checked> One semester</label>
             <label><input type="radio" name="stay" value="year"> A full year</label></fieldset>
@@ -169,14 +170,15 @@ function profile() {
   $('#ownForm').onsubmit = e => {
     e.preventDefault();
     const f = new FormData(e.target);
-    const origin = f.get('origin');
-    startGame({ preset: 'custom', name: 'You', flag: origin === 'eu' ? '🇪🇺' : '🌎', origin, stay: f.get('stay'), abroad: f.get('abroad') === 'yes' });
+    const o = f.get('origin'), origin = o === 'eu' ? 'eu' : 'noneu';
+    startGame({ preset: 'custom', name: 'You', flag: origin === 'eu' ? '🇪🇺' : '🌏', origin, visa: o === 'noneu', stay: f.get('stay'), abroad: f.get('abroad') === 'yes' });
   };
 }
 
 function startGame(p) {
   s.profile = p;
-  log('profile', { preset: p.preset, origin: p.origin, stay: p.stay, abroad: p.abroad });
+  if (p.visa === undefined) p.visa = p.origin === 'noneu';
+  log('profile', { preset: p.preset, origin: p.origin, visa: p.visa, stay: p.stay, abroad: p.abroad });
   refresh();
   // Within-run variant: status style balanced across the waiting procedures.
   const waitIds = STEPS.filter(st => st.waitSteps && visible(st)).map(st => st.id);
@@ -734,7 +736,7 @@ function openRole() {
   const eu = p.origin === 'eu', name = p.preset === 'custom' ? 'Your student' : p.name;
   const housing = { usihome: 'a room at USI Home', lease: 'a one-year lease in Molino Nuovo', sublet: 'a sublet in Viganello' }[s.flags.housing];
   const means = [
-    eu ? 'From the EU or EFTA: no visa needed.' : 'From outside the EU and EFTA: needs a Swiss visa before travelling.',
+    eu ? 'From the EU or EFTA: no visa needed.' : p.visa ? 'From outside the EU and EFTA: needs a Swiss visa before travelling.' : 'From outside the EU and EFTA, but no visa needed: still applies for the residence permit.',
     eu ? 'Can ask for an exemption from Swiss health insurance, with the European card.' : 'Needs a Swiss student health insurance.',
     p.stay === 'semester' ? 'Stays one semester: one-year leases are a problem.' : 'Stays a full year: a one-year lease fits.',
     p.abroad ? 'Has lived abroad before: knows some of the drill.' : 'First time living abroad.',
