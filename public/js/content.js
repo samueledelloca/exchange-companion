@@ -330,6 +330,7 @@ export const STEPS = [
           { id: 'lake', label: 'Drop the bags and walk to the lake', go: c => land(c, 'Welcome to Lugano! Remember: register at Punto Città within 8 days.') },
           { id: 'quiz', label: 'Ask the companion what the first two weeks look like', go: () => 'quiz' },
           { id: 'sim', label: 'Buy a Swiss SIM card at the station (about 25 CHF)', go: c => { c.set('swissPhone', true); c.spend(25, 'Swiss SIM card'); return land(c, 'Swiss number sorted: landlords and offices stop asking for one.'); } },
+          { id: 'esim', label: 'My Swiss eSIM is already active: I set it up online before leaving (about 20 CHF)', go: c => { c.set('swissPhone', true); c.set('esim', true); c.spend(20, 'Swiss eSIM, set up before leaving'); return land(c, 'Smart move: your Swiss number worked the moment the train left the tunnel. No queue at the shop.'); } },
         ],
       }),
       quiz: () => ({
