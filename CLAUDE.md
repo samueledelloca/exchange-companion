@@ -10,10 +10,22 @@ interactive map. Read `README.md` (files, URL parameters) and `DEPLOY.md` (publi
 - Do not push on 26.11 or 2.12 during the class sessions unless asked: people are playing.
 
 ## Study data
-- `./scripts/fetch.sh [round]` downloads `data/sessions.csv`, `data/events.csv` and
-  `data/last.jsonl` through the protected endpoint `/api/export` (see its header comment).
-  It needs the environment variable `EXPORT_KEY`; never print it, write it into a file in the
-  repo, or put it in a commit, an issue or a URL you show.
+The data can be exported without the maintainer's laptop. The site has a protected download,
+`/api/export`, that gives exactly the same CSV files as the laptop export (`scripts/export.sh`).
+Without the right key it returns "not found" (404).
+- In a Claude session: run `./scripts/fetch.sh`. It saves `data/sessions.csv`,
+  `data/events.csv` and the raw data (`data/last.jsonl`), ready for analysis. Add a round name
+  for one round only, for example `./scripts/fetch.sh class-2026-11-26`.
+- It needs the environment variable `EXPORT_KEY` (set in the cloud environment's settings, and
+  network access to `exchange-companion.pages.dev`). If it is missing, ask the maintainer to add
+  it; never print the key, write it into a file in the repo, or put it in a commit, an issue or a
+  URL you show.
+- Straight to a phone, no Claude needed: open
+  `https://exchange-companion.pages.dev/api/export?key=KEY` in the browser and the CSV
+  downloads. Add `&file=events` for the events file, `&file=jsonl` for the raw data,
+  `&round=class-2026-11-26` for one round.
+- If `fetch.sh` says it got the web page instead of data, a deploy is still propagating; wait a
+  minute and retry.
 - `data/` is git-ignored. Never commit recordings or CSVs; never paste participant answers
   into GitHub. Summaries (counts, means) in the chat are fine.
 - Rounds: `test` (team tests and everything before 20.11.2026, 40 sessions), `pre-class`
