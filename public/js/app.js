@@ -340,9 +340,9 @@ function tutorial() {
         : `You are <b>${s.profile.name}</b> now: ${(PRESETS.find(p => p.id === s.profile.preset)?.blurb || '').replace(/^./, c => c.toLowerCase())} Decide as you think ${s.profile.name} would. You can always see who you play up here.` },
     { sel: '#map', text: `This is your exchange, as a map. Home is on the left: everything before departure. Lugano, on the right, opens once that is done and you can travel. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch to zoom and drag to move around, like any map.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
     { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
-    { id: 'legend', sel: isPhone() ? '#btn-legend' : '.legend', text: isPhone()
-        ? 'Paths: <b>gold</b> is my suggestion, <b>blue</b> is also open now, <b>green</b> is done. Badges on places: ✓ done, ⏳ waiting for someone else, ! action needed, 🔒 locked. Tap <b>?</b> any time to see this again.'
-        : 'The legend down here explains paths and badges: gold is my suggestion, blue is also open, green is done; ✓ done, ⏳ waiting for someone else, ! action needed.' },
+    { id: 'legend', sel: isPhone() ? '#btn-legend' : '.legend', text: `${isPhone() ? 'What the map shows (tap <b>?</b> any time to see it again):' : 'The legend down here explains the map:'}
+        <span class="tlegend"><span><i class="ln next"></i>suggested next</span><span><i class="ln"></i>also open now</span><span><i class="ln done"></i>walked</span>
+        <span><i class="b done">✓</i>done</span><span><i class="b waiting">⏳</i>waiting</span><span><i class="b action">!</i>action needed</span><span><i class="b locked">🔒</i>locked</span></span>` },
     { sel: '.hud', text: 'Keep an eye up here. The calendar moves on with every step. Your budget counts what the exchange costs you, and mistakes add surprises. Each finished area earns you a stamp.' },
     { sel: '#btn-steps', text: 'Prefer a list to a map? All your steps are here too.' },
     { sel: '#btn-trips', text: 'Curious how others did it? Peek at the trips of past students.' },

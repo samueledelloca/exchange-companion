@@ -543,3 +543,11 @@ button.chip.role:hover { border-color: var(--accent); }
 .arrival.still.ar-car .ar-pan { transform: translateY(-820px); }
 .arrival.still .ar-cap .c1 { opacity: 0; }
 .arrival.still .ar-cap .c2 { opacity: 1; }
+
+/* tutorial legend card: same symbols as the legend */
+.tlegend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin-top: 8px; font-size: .88rem; font-weight: 600; }
+.tlegend > span { display: inline-flex; align-items: center; gap: 7px; }
+.tlegend .ln { display: inline-block; width: 22px; height: 0; border-top: 3px solid #5B7FC0; flex: none; }
+.tlegend .ln.next { border-top: 5px dashed #F2B705; }
+.tlegend .ln.done { border-top-color: var(--win); }
+.tlegend .b { flex: none; }
