@@ -317,6 +317,8 @@ function say(html, ms = 7000) {
   const b = $('#bubble'); if (!b) return;
   b.innerHTML = `${html}<button class="x" aria-label="Close">×</button>`;
   b.hidden = false;
+  const btn = $('#buddyBtn');
+  if (btn) { btn.classList.remove('talk'); void btn.offsetWidth; btn.classList.add('talk'); }
   b.querySelector('.x').onclick = () => { b.hidden = true; log('buddy_dismiss'); };
   clearTimeout(bubbleTimer);
   if (ms) bubbleTimer = setTimeout(() => { b.hidden = true; }, ms);
