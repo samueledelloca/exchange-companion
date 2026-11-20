@@ -91,7 +91,7 @@ function intro() {
     <main class="intro card-screen">
       <div class="buddy-hero">${buddySvg(150)}</div>
       <h1>Ciao! I'm ${BUDDY.name}, your exchange companion.</h1>
-      <p class="lead">In the next 5 to 10 minutes you will play an exchange student coming to USI, in Lugano. You do the paperwork, find a room, pick courses and settle in, and I come along.</p>
+      <p class="lead">This is a role-play. In the next 5 to 10 minutes you <b>play the part of an exchange student</b> coming to USI, in Lugano: you pick a character, then do their paperwork, find them a room, pick their courses and settle in. I come along.</p>
       <p>Everything is simulated and simplified, but the problems along the way are ones real exchange students run into.</p>
       ${isPhone() && innerHeight > innerWidth ? '<p class="muted small">📱↻ On a phone the map is wider if you turn it sideways.</p>' : ''}
       <button class="btn primary" id="go">Sounds good, what's next?</button>
@@ -128,14 +128,15 @@ function consent() {
 function profile() {
   screen(`
     <main class="profile card-screen wide">
-      <h1>Who are you this time?</h1>
-      <p class="lead">Pick a student or make your own. Your path changes with your situation.</p>
-      <div class="presets">
-        ${PRESETS.map(p => `<button class="preset" data-id="${p.id}"><span class="flag">${p.flag}</span><b>${p.name}</b><span>${p.blurb}</span></button>`).join('')}
-      </div>
-      <details class="own">
-        <summary>Make my own student</summary>
-        <form id="ownForm">
+      <h1>Who will you play?</h1>
+      <p class="lead">For the next few minutes you play an exchange student. Make one like you, or play one of ours: their situation changes the path, so decide as you think they would.</p>
+      <section class="own-card">
+        <button class="own-toggle" id="ownToggle" type="button" aria-expanded="false" aria-controls="ownForm">
+          <span class="own-icon" aria-hidden="true"><svg viewBox="0 0 48 48" width="44" height="44"><circle cx="20" cy="16" r="8" fill="#2552B0"/><path d="M5 40c1.5-8.5 7.6-13 15-13s10 2.4 12.2 6" fill="#2552B0"/><g transform="translate(30 25) rotate(45)"><rect x="-3" y="-11" width="6" height="18" rx="1.5" fill="#F2B705" stroke="#172031" stroke-width="1.5"/><path d="M-3 7 L0 12 L3 7 Z" fill="#172031"/></g></svg></span>
+          <span class="own-text"><b>Create your own student</b><span>Choose where you come from, how long you stay and whether you have lived abroad. The closest to your own situation.</span></span>
+          <span class="own-chev" aria-hidden="true">›</span>
+        </button>
+        <form id="ownForm" hidden>
           <fieldset><legend>Where are you from?</legend>
             <label><input type="radio" name="origin" value="eu" checked> EU or EFTA country</label>
             <label><input type="radio" name="origin" value="noneu"> Outside the EU and EFTA</label></fieldset>
@@ -147,12 +148,21 @@ function profile() {
             <label><input type="radio" name="abroad" value="yes"> Yes</label></fieldset>
           <button class="btn primary" type="submit">Start with this student</button>
         </form>
-      </details>
+      </section>
+      <p class="or-line"><span>or play one of our students</span></p>
+      <div class="presets">
+        ${PRESETS.map(p => `<button class="preset" data-id="${p.id}"><span class="flag">${p.flag}</span><b>${p.name}</b><span>${p.blurb}</span></button>`).join('')}
+      </div>
     </main>`, 'center');
   app.querySelectorAll('.preset').forEach(b => b.onclick = () => {
     const p = PRESETS.find(x => x.id === b.dataset.id);
     startGame({ preset: p.id, name: p.name, flag: p.flag, origin: p.origin, stay: p.stay, abroad: p.abroad });
   });
+  $('#ownToggle').onclick = () => {
+    const f = $('#ownForm'), open = f.hidden;
+    f.hidden = !open; $('#ownToggle').setAttribute('aria-expanded', String(open));
+    if (open) { log('custom_open'); f.querySelector('input').focus(); }
+  };
   $('#ownForm').onsubmit = e => {
     e.preventDefault();
     const f = new FormData(e.target);
@@ -190,11 +200,13 @@ function mapScreen() {
     <header class="topbar">
       <div class="brand">${buddySvg(30)}<span>Exchange Companion</span></div>
       <div class="hud">
+        <span class="chip role" title="The student you are playing">${s.profile.flag} <span class="rl">You play </span><b>${s.profile.preset === 'custom' ? 'your student' : s.profile.name}</b></span>
         <span class="chip clock" title="Simulated time" aria-live="polite">📅 <span id="week"></span></span>
         <button class="chip costs" id="btn-costs" title="Your budget: open the breakdown">💸 <span id="cost"></span></button>
         <span class="stamps" id="stamps" aria-label="Area stamps"></span>
       </div>
       <nav class="tools">
+        <button class="btn small legend-btn" id="btn-legend" aria-label="What the map symbols mean" title="What the map symbols mean">?</button>
         <button class="btn small" id="btn-steps">My steps</button>
         <button class="btn small" id="btn-trips">Others' trips</button>
         <button class="btn small ghost" id="btn-end">End</button>
@@ -215,6 +227,7 @@ function mapScreen() {
     ${DEBUG ? `<div class="debug">buddy=${session.variant.buddy} tips=${session.variant.tips} status=${JSON.stringify(s.statusStyle)} seed=${seed}</div>` : ''}
   `, 'game');
   $('#btn-steps').onclick = openList;
+  $('#btn-legend').onclick = openLegend;
   $('#btn-trips').onclick = openTrips;
   $('#btn-end').onclick = confirmEnd;
   $('#btn-costs').onclick = openCosts;
@@ -307,15 +320,21 @@ function hint(manual = false) {
 function tutorial() {
   const first = s.next;
   const steps = [
+    { sel: '.chip.role', text: s.profile.preset === 'custom'
+        ? 'You are now playing the student you made. Decide as you think they would. You can always see who you play up here.'
+        : `You are <b>${s.profile.name}</b> now: ${(PRESETS.find(p => p.id === s.profile.preset)?.blurb || '').replace(/^./, c => c.toLowerCase())} Decide as you think ${s.profile.name} would. You can always see who you play up here.` },
     { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch to zoom and drag to move around, like any map.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
     { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
-    { sel: '.legend', text: 'Badges tell you the status: done, waiting for someone else, or action needed.' },
+    { id: 'legend', sel: isPhone() ? '#btn-legend' : '.legend', text: isPhone()
+        ? 'Paths: <b>gold</b> is my suggestion, <b>blue</b> is also open now, <b>green</b> is done. Badges on places: ✓ done, ⏳ waiting for someone else, ! action needed, 🔒 locked. Tap <b>?</b> any time to see this again.'
+        : 'The legend down here explains paths and badges: gold is my suggestion, blue is also open, green is done; ✓ done, ⏳ waiting for someone else, ! action needed.' },
     { sel: '.hud', text: 'Keep an eye up here. The calendar moves on with every step. Your budget counts what the exchange costs you, and mistakes add surprises. Each finished area earns you a stamp.' },
     { sel: '#btn-steps', text: 'Prefer a list to a map? All your steps are here too.' },
     { sel: '#btn-trips', text: 'Curious how others did it? Peek at the trips of past students.' },
     { sel: '#btn-end', text: 'You can stop whenever you like. Ready? Your first step is glowing.' },
   ];
-  if (s.profile.abroad) steps.splice(2, 1);
+  // students who lived abroad skip the badge card (they get the rest)
+  if (s.profile.abroad && !isPhone()) steps.splice(steps.findIndex(x => x.id === 'legend'), 1);
   let i = 0;
   const tStart = performance.now();
   const ov = document.createElement('div');
@@ -476,7 +495,7 @@ function renderStatus(st, sc) {
   log('status_view', { step: st.id, style });
   const tips = tipsHtml(st.id);
   panelHtml(st, `<div class="statusbox ${style}">⏳ ${text}</div>${tips}
-    <div class="microq" id="microq"><p>Do you know what to do next here?</p>
+    <div class="microq studyq" id="microq"><p class="studytag">📋 Study question, outside the game</p><p>Do you know what to do next here?</p>
       <button class="chipbtn" data-q="yes">Yes</button><button class="chipbtn" data-q="unsure">Not sure</button><button class="chipbtn" data-q="no">No</button></div>
     <div id="reply"></div>`,
     [...sc.actions.map(a => `<button class="btn choice" data-a="${a.id}">${a.label}</button>`), '<button class="btn ghost" id="backMap">Back to the map</button>'], 'waiting');
@@ -512,8 +531,8 @@ function askWhy(st, choice, cont) {
   s.why++;
   const panel = $('#panel');
   const box = document.createElement('div');
-  box.className = 'why';
-  box.innerHTML = `<p><b>A quick question for our study</b> (optional): why did you choose "${choice.label.toLowerCase()}"? There is no right answer. It helps us understand how people decide.</p>
+  box.className = 'why studyq';
+  box.innerHTML = `<p class="studytag">📋 Study question, outside the game (optional)</p><p>Why did you choose "${choice.label.toLowerCase()}"? There is no right answer. It helps us understand how people decide.</p>
     <div class="chips">${WHY_CHIPS.map((w, i) => `<button class="chipbtn" data-w="${i}">${w}</button>`).join('')}</div>
     <div class="why-own"><label for="whyTxt" class="sr-only">Your own words</label><input id="whyTxt" placeholder="Or in your own words (optional)" maxlength="200"><button class="btn small" id="whyOk">Send</button></div>
     <button class="btn-link" id="whySkip">Skip</button>`;
@@ -563,7 +582,7 @@ function finishStep(id, res) {
     const sc = st.scenes.waiting(ctx), style = s.statusStyle[id] || 'rich';
     log('status_view', { step: id, style, where: 'outcome' });
     waitBox = `<div class="statusbox ${style}">⏳ ${style === 'rich' ? sc.rich : sc.bare}</div>
-      <div class="microq" id="microq" data-step="${id}" data-style="${style}"><p>Do you know what to do next here?</p>
+      <div class="microq studyq" id="microq" data-step="${id}" data-style="${style}"><p class="studytag">📋 Study question, outside the game</p><p>Do you know what to do next here?</p>
       <button class="chipbtn" data-q="yes">Yes</button><button class="chipbtn" data-q="unsure">Not sure</button><button class="chipbtn" data-q="no">No</button></div>`;
   }
   const meme = playful() && res.mood === 'win' && MEMES[id] && status === 'done';
@@ -694,6 +713,21 @@ function viewTrip(t) {
 function zoomMap(x, y) {
   if (x === null) { lastFocus = null; return setTimeout(() => focusMap(true), 0); }
   follow(x, y, 320);
+}
+
+function openLegend() {
+  log('legend_open');
+  modal(`<h2>What the map shows</h2>
+    <ul class="legendlist">
+      <li><i class="ln next"></i><span><b>Gold path</b>: the step I suggest next</span></li>
+      <li><i class="ln"></i><span><b>Blue path</b>: also open now, in any order</span></li>
+      <li><i class="ln done"></i><span><b>Green path</b>: steps you have done</span></li>
+      <li><i class="ln lock"></i><span><b>Faint dotted path</b>: locked until the steps before it are done</span></li>
+      <li><i class="b done">✓</i><span>Done</span></li>
+      <li><i class="b waiting">⏳</i><span>Waiting for someone else (office, university): nothing to do for now</span></li>
+      <li><i class="b action">!</i><span>Action needed: news arrived, or you postponed it</span></li>
+      <li><i class="b locked">🔒</i><span>Locked</span></li>
+    </ul>`, 'Map legend');
 }
 
 function openCosts() {

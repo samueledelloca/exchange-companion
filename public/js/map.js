@@ -17,13 +17,12 @@ export function baseMap() {
     </pattern>
   </defs>
   <rect x="-2000" y="-2000" width="5000" height="4620" class="ground"/>
-  <rect class="base" x="0" y="0" width="1000" height="620" fill="#EEF2F6"/>
-  <g clip-path="url(#frame)">
-    <rect x="230" y="18" width="762" height="584" fill="#EDF1E4"/>
+  <g>
     <!-- relief: San Salvatore, Monte Brè and the Boglia slopes -->
     <ellipse cx="1000" cy="230" rx="170" ry="170" fill="url(#hill)"/>
     <ellipse cx="900" cy="20" rx="200" ry="80" fill="url(#hill)"/>
-    <ellipse cx="240" cy="600" rx="130" ry="110" fill="url(#hill)"/>
+    <ellipse cx="356" cy="820" rx="150" ry="120" fill="url(#hill)"/>
+    <ellipse cx="1080" cy="220" rx="180" ry="160" fill="url(#hill)"/>
     <path d="${GEO.wood}" fill="#CFE0BF"/>
     <path d="${GEO.town}" fill="#E4E1D8"/>
     <path d="${GEO.park}" fill="#C4DDB0"/>
@@ -31,14 +30,16 @@ export function baseMap() {
     <path d="${GEO.river}" fill="none" stroke="#8EC1E1" stroke-width="3" stroke-linecap="round"/>
     <path d="${GEO.roads}" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
     <path d="${GEO.rail}" fill="none" stroke="#7D838D" stroke-width="2" stroke-dasharray="6 3"/>
-    <text x="452" y="590" class="maplabel soft" text-anchor="middle">↙ Paradiso, San Salvatore</text>
+    <path d="${GEO.motorway}" fill="none" stroke="#F3D9A4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <g class="peak"><path d="M349 832 l7 -12 l7 12 z"/><path d="M1072 210 l7 -12 l7 12 z"/></g>
+    <text x="356" y="852" class="maplabel soft" text-anchor="middle">Monte San Salvatore</text>
+    <text x="300" y="770" class="maplabel soft" text-anchor="middle">Paradiso</text>
     <text x="900" y="400" class="maplabel soft" text-anchor="middle">Castagnola</text>
     <text x="700" y="540" class="maplabel lakelabel" text-anchor="middle">Lago di Lugano</text>
     <text x="986" y="596" class="osm" text-anchor="end">© OpenStreetMap contributors</text>
   </g>
-  <rect class="frame" x="230" y="18" width="762" height="584" rx="18" fill="none" stroke="#C9D3DF" stroke-width="1.5"/>
   <!-- home region -->
-  <rect x="18" y="40" width="190" height="540" rx="22" fill="#E3E9F4" stroke="#B9C6DE" stroke-width="2" stroke-dasharray="6 6"/>
+  <rect x="18" y="40" width="190" height="540" rx="22" fill="#E3E9F4" fill-opacity=".93" stroke="#B9C6DE" stroke-width="2" stroke-dasharray="6 6"/>
   <text x="113" y="76" class="maplabel region" text-anchor="middle">Home</text>
   <text x="113" y="560" class="maplabel soft" text-anchor="middle">before departure</text>
   <!-- the journey from home -->
