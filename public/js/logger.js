@@ -2,7 +2,9 @@
 // timestamps, the variant, and what the participant did.
 import { CONFIG } from './config.js';
 
-const t0 = performance.now();
+let t0 = performance.now();
+// After a resume, keep event times growing from where the previous page stopped.
+export function continueClock(lastT) { t0 = performance.now() - lastT - 1000; }
 
 // Short participant code, shown to the participant so they can ask to withdraw.
 // No 0/O/1/I to avoid misreading.

@@ -1,7 +1,7 @@
 // Exchange Companion: game engine, screens, buddy, logging hooks.
 import { BUDDY, AREAS, PLACES, STEPS, TIPS, TRIPS, PRESETS, MEMES, WHY_CHIPS, UEQS, TAILORED } from './content.js';
 import { CONFIG } from './config.js';
-import { session, log, send, download } from './logger.js';
+import { session, log, send, download, continueClock } from './logger.js';
 import { baseMap, drawMap, drawAvatar, drawTrail, statusText } from './map.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -10,9 +10,16 @@ const params = new URLSearchParams(location.search);
 const DEBUG = params.has('debug');
 
 // ---------- randomness (seeded, so a session can be replayed) ----------
-const seed = Number(params.get('seed')) || Math.floor(Math.random() * 2 ** 31);
+// A game in progress is kept in this tab (sessionStorage), so an accidental
+// reload can continue the same session instead of starting over.
+const SAVE_KEY = 'ec-game';
+let saved = null;
+try { saved = JSON.parse(sessionStorage.getItem(SAVE_KEY) || 'null'); } catch (e) { saved = null; }
+const seed = saved?.seed || Number(params.get('seed')) || Math.floor(Math.random() * 2 ** 31);
 function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-const rng = mulberry32(seed);
+const rawRng = mulberry32(seed);
+let rngCalls = 0;
+const rng = () => { rngCalls++; return rawRng(); };
 const pick = arr => arr[Math.floor(rng() * arr.length)];
 
 // ---------- variants ----------
@@ -83,7 +90,7 @@ function intro() {
     <main class="intro card-screen">
       <div class="buddy-hero">${buddySvg(150)}</div>
       <h1>Ciao! I'm ${BUDDY.name}, your exchange companion.</h1>
-      <p class="lead">In the next 5 to 8 minutes you will play an exchange student coming to USI, in Lugano. You do the paperwork, find a room, pick courses and settle in, and I come along.</p>
+      <p class="lead">In the next 5 to 10 minutes you will play an exchange student coming to USI, in Lugano. You do the paperwork, find a room, pick courses and settle in, and I come along.</p>
       <p>Everything is simulated and simplified, but the problems along the way are ones real exchange students run into.</p>
       <button class="btn primary" id="go">Sounds good, what's next?</button>
     </main>`, 'center');
@@ -213,8 +220,13 @@ function mapScreen() {
   redraw();
 }
 
+function saveGame() {
+  try { sessionStorage.setItem(SAVE_KEY, JSON.stringify({ seed, rngCalls, s })); } catch (e) { /* storage may be blocked */ }
+}
+
 function redraw() {
   refresh();
+  saveGame();
   const svg = $('#map');
   drawMap(svg, STEPS, s, visible, openStep);
   drawAvatar(svg, s.place, s.profile.flag);
@@ -781,6 +793,7 @@ function questionnaire() {
 }
 
 function thanks(sent) {
+  try { sessionStorage.removeItem(SAVE_KEY); sessionStorage.removeItem('ec-log'); } catch (e) { /* ignore */ }
   const line = playful()
     ? 'That\'s a wrap! Bags unpacked, paperwork done. I\'m off to an aperitivo by the lake. Ciao, and grazie for travelling with me!'
     : 'Thank you for travelling with me. Your answers will help us make the companion better. Buon soggiorno!';
@@ -801,4 +814,34 @@ const beacon = () => { if (s.consent && !session.sent && performance.now() - las
 window.addEventListener('pagehide', beacon);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') beacon(); });
 
-intro();
+// Desktop and Android browsers ask before leaving or reloading mid-game
+// (iOS ignores this, hence the resume screen below).
+window.addEventListener('beforeunload', e => {
+  if (s.consent && s.profile && !session.sent) { e.preventDefault(); e.returnValue = ''; }
+});
+
+function resumeScreen(prev, log0) {
+  screen(`<main class="card-screen center-text"><div class="buddy-hero">${buddySvg(110)}</div>
+    <h1>Welcome back!</h1>
+    <p class="lead">The page was reloaded, but your exchange is still here${prev.s.profile?.name && prev.s.profile.preset !== 'custom' ? ` (you are ${prev.s.profile.name})` : ''}.</p>
+    <div class="actions center"><button class="btn primary" id="resume">Continue where I left off</button><button class="btn ghost" id="restart">Start over</button></div></main>`, 'center');
+  $('#resume').onclick = () => {
+    Object.assign(s, prev.s);
+    if (log0) { Object.assign(session, log0, { sent: false }); continueClock(log0.events.at(-1)?.t || 0); }
+    // replay the dice so the rest of the run stays the same as before the reload
+    while (rngCalls < prev.rngCalls) rng();
+    Object.keys(AREAS).filter(areaDone).forEach(a => shownStamps.add(a));
+    log('resume', { finished: s.finished });
+    if (s.finished) return questionnaire();
+    mapScreen(); hint();
+  };
+  $('#restart').onclick = () => {
+    try { sessionStorage.removeItem(SAVE_KEY); sessionStorage.removeItem('ec-log'); } catch (e) { /* ignore */ }
+    location.replace(location.pathname + location.search);
+  };
+}
+
+let savedLog = null;
+try { savedLog = JSON.parse(sessionStorage.getItem('ec-log') || 'null'); } catch (e) { savedLog = null; }
+if (saved?.s?.consent && saved.s.profile && !(savedLog && savedLog.sent)) resumeScreen(saved, savedLog);
+else intro();

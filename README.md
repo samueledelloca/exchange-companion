@@ -3,7 +3,7 @@
 Group 6, USI UX Design 2026. A simulated exchange told as an interactive map of Lugano.
 The participant plays an exchange student and walks paths whose steps depend on each
 other. The companion (Miro, the cat) guides them, and the app records what they do.
-A play-through takes about 5 to 8 minutes plus a 2-minute questionnaire.
+A play-through takes about 5 to 10 minutes plus a 2-minute questionnaire.
 
 ## Run it
 
@@ -91,6 +91,12 @@ costs realistic, others' trips useful), two open questions, and a screener (exch
 past, student, other), plus optional background questions in broad categories (age range,
 region where they grew up, occupation, field). We also sample up to three "why did you choose that?" prompts
 per run, after choices with several reasonable options.
+
+## Accidental reloads
+
+Desktop and Android browsers ask before reloading mid-game. iPhones ignore that prompt, so the
+game state is also kept in the tab: after a reload the companion offers to continue the same
+session (same id and code, event `resume`). A step left half-way restarts from its first scene.
 
 ## Data
 
