@@ -151,9 +151,12 @@ export function drawTrail(svg, path, who) {
   if (who) {
     const end = PLACES[path[path.length - 1]];
     const tag = el('g', { class: 'trailtag', transform: `translate(${Math.min(end.x, 900)} ${Math.max(end.y - 66, 34)})` });
-    tag.appendChild(el('rect', { x: -60, y: -16, width: 120, height: 30, rx: 15 }));
-    tag.appendChild(el('text', { 'text-anchor': 'middle', y: 5 }, `${who}'s trip`));
+    const rect = el('rect', { x: -60, y: -16, width: 120, height: 30, rx: 15 });
+    const label = el('text', { 'text-anchor': 'middle', y: 5 }, who === 'A past student' ? "A past student's trip" : `${who}'s trip`);
+    tag.appendChild(rect); tag.appendChild(label);
     g.appendChild(tag);
+    // size the pill to its text
+    try { const w = label.getComputedTextLength() + 28; rect.setAttribute('x', -w / 2); rect.setAttribute('width', w); } catch (e) { /* not rendered yet */ }
   }
 }
 

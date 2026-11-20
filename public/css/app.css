@@ -483,3 +483,4 @@ html, body { overscroll-behavior-y: none; }
 .legendlist .ln.next { border-top: 6px dashed #F2B705; }
 .legendlist .ln.done { border-top-color: var(--win); }
 .legendlist .ln.lock { border-top: 3px dotted #9AA6B8; }
+#btn-trips.active { background: #172031; color: #fff; }

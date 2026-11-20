@@ -390,7 +390,7 @@ function openStep(id) {
   const st = byId(id); const status = s.steps[id].status;
   closeModal();
   const bub = $('#bubble'); if (bub) bub.hidden = true;
-  if ($('#map')?.classList.contains('viewing-trip')) { drawTrail($('#map'), null); $('#tripBanner').hidden = true; }
+  if ($('#map')?.classList.contains('viewing-trip')) { drawTrail($('#map'), null); $('#tripBanner').hidden = true; tripButton(null); }
   log('open_step', { step: id, status });
   if (status !== 'done' && status !== 'locked' && current?.id !== id) { dayAtOpen = s.day; costsAtOpen = s.costs.length; }
   const panel = $('#panel'); panel.hidden = false;
@@ -690,8 +690,9 @@ function viewTrip(t) {
     <p class="muted small tl-hint">Tap a step to see it on the map.</p>
     <ol class="timeline">${steps.map(([id, mood, note], i) => { const st = byId(id); return `<li class="${mood}" data-i="${i}" tabindex="0"><span class="tl-place">${PLACES[st.place].icon} ${PLACES[st.place].label}</span><b>${st.title}</b><span>${note}</span></li>`; }).join('')}</ol>
     <div class="choices"><button class="btn primary" id="backMine">Back to my map</button></div>`;
-  const back = () => { drawTrail($('#map'), null); ban.hidden = true; panel.hidden = true; zoomMap(null); log('trip_hide'); redraw(); };
+  const back = () => { drawTrail($('#map'), null); ban.hidden = true; panel.hidden = true; tripButton(null); zoomMap(null); log('trip_hide'); redraw(); };
   $('#hideTrip').onclick = back; $('#backMine').onclick = back; $('#pClose').onclick = back;
+  tripButton(back);
   // Tap a step: highlight its stop on the trail and bring it into view (phones scroll the map).
   const show = i => {
     const st = byId(steps[i][0]);
@@ -707,6 +708,13 @@ function viewTrip(t) {
   });
   setTimeout(() => show(0), 50);
   $('#backMine').focus({ preventScroll: true });
+}
+
+// While a trip is shown, the "Others' trips" button becomes the way back.
+function tripButton(back) {
+  const b = $('#btn-trips'); if (!b) return;
+  if (back) { b.textContent = '← My map'; b.classList.add('active'); b.onclick = () => { log('trip_back_button'); back(); }; }
+  else { b.textContent = "Others' trips"; b.classList.remove('active'); b.onclick = openTrips; }
 }
 
 // Trip view on phones: follow the selected stop closely; null goes back to your own map.
