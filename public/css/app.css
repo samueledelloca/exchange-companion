@@ -560,3 +560,19 @@ button.chip.role:hover { border-color: var(--accent); }
 .arrival .shimmer { animation: arShimmer 3s ease-in-out infinite alternate; }
 @keyframes arShimmer { to { transform: translateX(24px); } }
 .arrival.still .ar-land { transform: none; }
+/* plane: looking out of the cabin window, the Alps and the lakes below */
+.ar-flight .ar-out { transform-box: view-box; transform-origin: 500px 330px; animation: arApproach 4.4s ease-in-out forwards; }
+@keyframes arApproach { from { transform: translate(40px, -10px) scale(1); } to { transform: translate(-40px, 30px) scale(1.3); } }
+.ar-flight .ar-wisps { animation: arWisp 4.4s linear forwards; }
+@keyframes arWisp { to { transform: translateX(-300px); } }
+.ar-flight .ar-wingp { animation: arBob 1.6s ease-in-out infinite alternate; }
+@keyframes arBob { to { transform: translateY(4px); } }
+.ar-flight .ar-cabin { animation: arOut .9s 4.3s forwards; }
+.ar-flight .ar-cap .c1 { animation-delay: 4.0s; }
+.ar-flight .ar-cap .c2 { animation-delay: 4.2s; }
+/* car: down the Tremola, then the view opens on the lake */
+.ar-car .ar-land { opacity: 0; animation: arIn .9s 4.1s forwards; }
+.ar-car .ar-cap .c1 { animation-delay: 3.9s; }
+.ar-car .ar-cap .c2 { animation-delay: 4.1s; }
+.arrival.still .ar-cabin { display: none; }
+.arrival.still.ar-car .ar-land { opacity: 1; }

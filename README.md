@@ -23,7 +23,7 @@ Python 3 only, no install; sessions go to `data/`. Useful URL parameters:
 | `?tips=named` or `anon` | force the tips variant (signed by a past student vs anonymous) |
 | `?seed=42` | replay the same random events (USI Home lottery, landlord replies, recognition) |
 | `?debug=1` | show the assigned variant at the top |
-| `?demo=arrival&mode=train` (or `flight`, `car`) | jump straight to the arrival scene, as Jonas with everything before departure done; nothing is recorded |
+| `?demo=arrival&mode=train` (or `flight`, `car`; add `&via=zurich` for the Zurich flight) | jump straight to the arrival scene, as Jonas with everything before departure done; nothing is recorded |
 
 ## Files
 
@@ -62,8 +62,8 @@ the class session.**
   Home (everything before departure, online or with the home university) and Lugano (in
   person). Lugano stays fogged and locked until you arrive: when every pre-departure step is done the
   companion says it is time to travel (event `ready_to_travel`); after the travel choice a
-  short arrival scene plays (train: out of the Gotthard Base Tunnel; plane: through the
-  clouds over the real lake; car: down the Tremola hairpins), skippable and still with
+  short arrival scene plays (train: out of the Gotthard Base Tunnel; plane: out of the cabin
+  window over the Alps and lakes, landing in Milan or Zurich; car: down the Tremola hairpins), skippable and still with
   reduced motion, then the fog lifts (event `lugano_unlocked`, with the travel mode). After arrival, a welcome day at the International
   office (attend or skip) leads to the welcome aperitivo.
 - **Personalisation.** Three personas from Report 1, or a custom student (EU or not,

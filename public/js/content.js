@@ -309,15 +309,15 @@ export const STEPS = [
         why: true,
         choices: c.s.profile.origin === 'eu' ? [
           { id: 'train', label: 'Direct train through the Gotthard (about 130 CHF)', go: c => { c.set('travelMode', 'train'); c.spend(130, 'Train to Lugano'); c.days(1); c.set('travelNote', 'Six hours of mountains and tunnels, right on time.'); return 'arrived'; } },
-          { id: 'flight', label: 'Cheapest flight to Milan, then the bus (about 110 CHF)', go: c => { c.set('travelMode', 'flight');
+          { id: 'flight', label: 'Cheapest flight to Milan, then the bus (about 110 CHF)', go: c => { c.set('travelMode', 'flight'); c.set('travelVia', 'milan');
               c.spend(110, 'Flight and bus to Lugano'); c.days(1);
               if (c.rng() < 0.5) { c.cost(160, 'Taxi from Milan after a missed bus'); c.problem('missed-bus', 'random'); c.set('travelNote', 'The flight lands late and the last bus to Lugano has gone. Taxi: 160 CHF.'); }
               else c.set('travelNote', 'Cheap flight, bus on time. Lucky you.');
               return 'arrived'; } },
           { id: 'car', label: 'Drive down with family (fuel and vignette, about 90 CHF)', go: c => { c.set('travelMode', 'car'); c.spend(90, 'Fuel and motorway vignette'); c.days(1); c.set('travelNote', 'Your family carries the boxes and leaves you a full fridge.'); return 'arrived'; } },
         ] : [
-          { id: 'zurich', label: 'Long-haul flight to Zurich, then the train (about 950 CHF)', go: c => { c.set('travelMode', 'flight'); c.spend(950, 'Flight to Zurich and train to Lugano'); c.days(1); c.set('travelNote', 'Thirteen hours in the air and three on the train. Tired, but on time.'); return 'arrived'; } },
-          { id: 'milan', label: 'Cheaper long-haul flight to Milan, then the bus (about 800 CHF)', go: c => { c.set('travelMode', 'flight');
+          { id: 'zurich', label: 'Long-haul flight to Zurich, then the train (about 950 CHF)', go: c => { c.set('travelMode', 'flight'); c.set('travelVia', 'zurich'); c.spend(950, 'Flight to Zurich and train to Lugano'); c.days(1); c.set('travelNote', 'Thirteen hours in the air and three on the train. Tired, but on time.'); return 'arrived'; } },
+          { id: 'milan', label: 'Cheaper long-haul flight to Milan, then the bus (about 800 CHF)', go: c => { c.set('travelMode', 'flight'); c.set('travelVia', 'milan');
               c.spend(800, 'Flight to Milan and bus to Lugano'); c.days(1);
               if (c.rng() < 0.5) { c.cost(160, 'Taxi from Milan after a missed bus'); c.problem('missed-bus', 'random'); c.set('travelNote', 'The flight lands late and the last bus to Lugano has gone. Taxi: 160 CHF.'); }
               else c.set('travelNote', 'Long flight, bus on time. Lucky you.');

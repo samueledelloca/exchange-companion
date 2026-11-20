@@ -5,7 +5,8 @@ import { GEO } from './geo.js';
 
 const SCENES = {
   train: {
-    caption: ['Through the Gotthard Base Tunnel, 57 km under the Alps…', 'Benvenuti in Ticino!'],
+    duration: 4800,
+    caption: () => ['Through the Gotthard Base Tunnel, 57 km under the Alps…', 'Benvenuti in Ticino!'],
     svg: () => `
       <defs>
         ${skyDefs()}
@@ -28,42 +29,85 @@ const SCENES = {
       </g>`,
   },
   flight: {
-    caption: ['Descending over the lakes…', 'Benvenuti in Ticino!'],
+    duration: 6000,
+    caption: via => ['Over the Alps, the lakes below…', via === 'zurich' ? 'Landed in Zurich, then the train south through the Gotthard… Benvenuti in Ticino!' : 'Landed in Milan. An hour on the bus, and… Benvenuti in Ticino!'],
     svg: () => `
-      <defs><linearGradient id="arSky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6FA9DA"/><stop offset="1" stop-color="#CFE5F5"/></linearGradient></defs>
-      <rect x="-500" y="-500" width="2000" height="1600" fill="#EDF1E4"/>
-      <g class="ar-ground">
-        <g transform="translate(-150 -10)">
-          <path d="${GEO.wood}" fill="#CFE0BF"/><path d="${GEO.town}" fill="#E4E1D8"/>
-          <path d="${GEO.lake}" fill="#8EC1E1" fill-rule="evenodd" stroke="#6FA8CF" stroke-width="2"/>
-          <path d="${GEO.roads}" fill="none" stroke="#fff" stroke-width="2"/>
+      <defs>
+        ${skyDefs()}
+        <linearGradient id="arCabin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C9CED6"/><stop offset=".5" stop-color="#E7E9ED"/><stop offset="1" stop-color="#C3C9D1"/></linearGradient>
+        <linearGradient id="arHigh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E7CC0"/><stop offset=".55" stop-color="#A9CDEB"/><stop offset="1" stop-color="#E6EEF2"/></linearGradient>
+        <linearGradient id="arWing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2F4F7"/><stop offset="1" stop-color="#AEB6C2"/></linearGradient>
+        <clipPath id="arWin"><rect x="335" y="95" width="330" height="410" rx="150"/></clipPath>
+      </defs>
+      <g class="ar-land">${landscape()}</g>
+      <g class="ar-cabin">
+        <rect x="-500" y="-500" width="2000" height="1600" fill="url(#arCabin)"/>
+        <path d="M-500 60 H1500 M-500 545 H1500" stroke="#B5BCC6" stroke-width="3"/>
+        <rect x="310" y="70" width="380" height="460" rx="170" fill="#F4F5F7" stroke="#B8BFC9" stroke-width="3"/>
+        <rect x="325" y="85" width="350" height="430" rx="158" fill="#D9DEE5"/>
+        <g clip-path="url(#arWin)">
+          <g class="ar-out">
+            <rect x="200" y="60" width="600" height="500" fill="url(#arHigh)"/>
+            <path d="M200 255 L240 238 L262 246 L290 226 L318 240 L350 222 L380 236 L410 218 L440 232 L470 214 L505 230 L540 216 L575 234 L610 220 L650 238 L690 224 L730 240 L800 232 V300 H200 Z" fill="#E8EEF3"/>
+            <path d="M200 300 L250 262 L300 284 L360 252 L420 280 L480 248 L540 276 L600 250 L660 278 L720 256 L800 280 V560 H200 Z" fill="#8FA88A"/>
+            <path d="M250 262 L268 270 L282 266 Z M360 252 L380 262 L392 258 Z M480 248 L498 258 L510 255 Z M600 250 L620 260 L632 256 Z M720 256 L738 264 L750 261 Z" fill="#fff"/>
+            <path d="M200 340 L280 300 L360 330 L450 296 L540 334 L640 300 L800 340 V560 H200 Z" fill="#7C9A74"/>
+            <path d="M200 420 L300 392 L420 430 L560 398 L680 436 L800 410 V560 H200 Z" fill="#6E8E66" opacity=".45"/>
+            <path d="M378 520 C384 450 394 392 410 340 C418 322 434 326 430 348 C420 404 414 460 412 520 Z" fill="#5E9FD0" stroke="#EAF4FB" stroke-width="1.5"/>
+            <path d="M470 470 C486 430 506 396 530 376 C544 364 560 368 556 384 C548 406 566 420 594 418 C624 416 640 428 628 440 C612 452 586 448 566 452 C544 458 534 480 528 500 C522 516 500 516 498 500 C496 488 482 488 470 470 Z" fill="#5E9FD0" stroke="#EAF4FB" stroke-width="1.5"/>
+            <path d="M610 520 C620 470 640 430 662 400 C670 390 684 394 680 408 C668 440 652 480 646 520 Z" fill="#5E9FD0" stroke="#EAF4FB" stroke-width="1.5"/>
+            <g class="ar-wisps" fill="#fff" opacity=".8">${cloud(330, 300, .45)}${cloud(700, 330, .5)}${cloud(860, 450, .45)}</g>
+          </g>
+          <path class="ar-wingp" d="M340 560 L450 500 L585 482 L596 488 L470 520 L372 575 Z" fill="url(#arWing)"/>
+          <circle cx="590" cy="485" r="3.5" fill="#E04848"/>
         </g>
-      </g>
-      <g class="ar-clouds">
-        <rect x="-500" y="-500" width="2000" height="1600" fill="url(#arSky2)" class="ar-skyfill"/>
-        <g class="cl cl-l">${cloud(120, 160, 1.6)}${cloud(260, 420, 1.3)}${cloud(40, 330, 1.1)}</g>
-        <g class="cl cl-r">${cloud(700, 140, 1.4)}${cloud(820, 380, 1.7)}${cloud(560, 470, 1.2)}</g>
-        <g class="plane"><path d="M0 0 l60 8 l18 -16 l8 2 l-8 20 l40 5 l14 -10 l6 1 l-6 13 l6 13 l-6 1 l-14 -10 l-40 5 l8 20 l-8 2 l-18 -16 l-60 8 z" fill="#fff" opacity=".9"/></g>
+        <rect x="325" y="85" width="350" height="70" fill="#EEF0F3" class="ar-shade" clip-path="url(#arWin)"/>
+        <rect x="325" y="153" width="350" height="4" fill="#D3D8DF" clip-path="url(#arWin)"/>
+        <rect x="325" y="85" width="350" height="430" rx="158" fill="none" stroke="#C6CCD5" stroke-width="10"/>
+        <rect x="-500" y="470" width="300" height="200" rx="40" fill="#5B6578" opacity=".25"/>
       </g>`,
   },
   car: {
-    caption: ['Down the Tremola, the old road over the Gotthard Pass…', 'Benvenuti in Ticino!'],
-    svg: () => `
-      <defs><linearGradient id="arSky3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9CCBEB"/><stop offset="1" stop-color="#EEF6FA"/></linearGradient>
-        ${skyDefs()}</defs>
-      <g class="ar-pan">
-        <rect x="-500" y="-500" width="2000" height="2600" fill="url(#arSky3)"/>
-        <path d="M-200 520 L120 120 L260 260 L420 40 L620 300 L760 140 L1200 560 V1500 H-200 Z" fill="#9DB48F"/>
-        <path d="M300 60 L420 40 L470 110 L400 95 Z M720 170 L760 140 L800 180 Z" fill="#fff" opacity=".9"/>
-        <path d="M-200 600 L200 380 L560 560 L900 420 L1200 640 V1500 H-200 Z" fill="#88A57C"/>
-        <path class="road" d="M420 330 C620 340 640 380 440 395 C250 410 260 450 470 460 C690 470 700 510 480 525 C270 540 280 585 500 595 C700 605 700 650 520 665 C380 680 420 760 500 800"
-          fill="none" stroke="#8B8F96" stroke-width="10" stroke-linecap="round"/>
-        <path d="M420 330 C620 340 640 380 440 395 C250 410 260 450 470 460 C690 470 700 510 480 525 C270 540 280 585 500 595 C700 605 700 650 520 665 C380 680 420 760 500 800"
-          fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="10 10"/>
-        <g class="car"><rect x="-13" y="-8" width="26" height="16" rx="5" fill="#C2410C"/><rect x="-1" y="-6" width="9" height="12" rx="3" fill="#FFE1D0"/>
-          <animateMotion dur="2.8s" begin="0.2s" fill="freeze" rotate="auto" path="M420 330 C620 340 640 380 440 395 C250 410 260 450 470 460 C690 470 700 510 480 525 C270 540 280 585 500 595 C700 605 700 650 520 665 C380 680 420 760 500 800"/></g>
-        <g transform="translate(0 820)">${landscape()}</g>
-      </g>`,
+    duration: 6000,
+    caption: () => ['Down the Tremola, the old cobbled road of the Gotthard Pass…', 'Benvenuti in Ticino!'],
+    svg: () => {
+      // hairpins in perspective: narrow and far at the top, wide and close at the bottom
+      const ys = [150, 178, 214, 262, 324, 404, 506], amp = k => 36 + k * 62;
+      let d = '', segs = '';
+      for (let k = 0; k < ys.length - 1; k++) {
+        const side = k % 2 ? -1 : 1, a = amp(k), a2 = amp(k + 1), y = ys[k], y2 = ys[k + 1], r = (y2 - y) * 0.75;
+        const x0 = 500 - side * a, x1 = 500 + side * a, xn = 500 + side * a2;
+        const run = `M${x0} ${y} L${x1} ${y + 4}`, turn = `C${x1 + side * r} ${y + 4} ${xn + side * r} ${y2} ${xn} ${y2}`;
+        d += (k ? ` L${x1} ${y + 4} ` : `M${x0} ${y} L${x1} ${y + 4} `) + turn;
+        const w = 3 + k * 3.2;
+        segs += `<path d="${run} ${turn}" fill="none" stroke="#7C7466" stroke-width="${w + 4}" stroke-linecap="round" transform="translate(0 ${1 + k})"/>
+          <path d="${run} ${turn}" fill="none" stroke="#A2978A" stroke-width="${w}" stroke-linecap="round"/>
+          <path d="${run} ${turn}" fill="none" stroke="#C2B8AA" stroke-width="${Math.max(1, w * 0.45)}" stroke-dasharray="${1 + k * 0.6} ${2 + k}" stroke-linecap="round"/>`;
+      }
+      // conifers along the slopes, smaller towards the pass
+      const trees = [[150, 300], [230, 250], [820, 270], [905, 330], [120, 420], [940, 450], [330, 560], [700, 560], [860, 600], [60, 330], [610, 205], [380, 215]]
+        .map(([x, y]) => { const k = 0.35 + (y - 190) / 420; return `<path d="M${x} ${y - 34 * k} L${x - 13 * k} ${y} L${x + 13 * k} ${y} Z" fill="#4F7A4A"/><rect x="${x - 2 * k}" y="${y}" width="${4 * k}" height="${6 * k}" fill="#6B5A44"/>`; }).join('');
+      return `
+      <defs>${skyDefs()}<linearGradient id="arPass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8DBBE3"/><stop offset="1" stop-color="#E4EEF4"/></linearGradient></defs>
+      <g class="ar-pass">
+        <rect x="-500" y="-500" width="2000" height="1600" fill="url(#arPass)"/>
+        <path d="M-200 260 L60 70 L210 170 L330 40 L470 150 L600 30 L740 140 L880 60 L1200 250 V700 H-200 Z" fill="#A9B7BF"/>
+        <path d="M300 70 L330 40 L362 74 L344 70 L330 82 L316 70 Z M572 58 L600 30 L630 62 L612 58 L600 70 L588 58 Z M852 86 L880 60 L908 88 L892 84 L880 94 Z M40 86 L60 70 L84 90 Z" fill="#fff"/>
+        <path d="M-200 220 C100 190 300 140 500 135 C700 140 900 190 1200 220 V700 H-200 Z" fill="#9FB38F"/>
+        <ellipse cx="420" cy="140" rx="34" ry="6" fill="#7FB0D6"/>
+        <g transform="translate(560 120)"><rect x="0" y="0" width="34" height="18" fill="#C9C2B4"/><path d="M-3 0 L17 -10 L37 0 Z" fill="#6B6159"/><rect x="6" y="6" width="5" height="5" fill="#5B6578"/><rect x="22" y="6" width="5" height="5" fill="#5B6578"/></g>
+        <path d="M-200 700 L-200 260 C0 300 160 420 250 700 Z" fill="#7F9A70"/>
+        <path d="M1200 700 L1200 260 C1000 300 840 420 750 700 Z" fill="#7F9A70"/>
+        ${trees}
+        ${segs}
+        <g transform="translate(225 452)"><rect x="-3" y="0" width="6" height="70" fill="#5B6578"/><rect x="-62" y="-36" width="124" height="40" rx="5" fill="#2F6E3B"/><text x="0" y="-11" text-anchor="middle" font-size="17" font-weight="800" fill="#fff" font-family="Plus Jakarta Sans, sans-serif">Airolo, Ticino</text></g>
+        <g class="car">
+          <g transform="rotate(0)"><rect x="-13" y="-7" width="26" height="14" rx="5" fill="#C2410C"/><rect x="2" y="-5.5" width="6" height="11" rx="2" fill="#2E3A4A"/><rect x="-9" y="-5.5" width="5" height="11" rx="2" fill="#2E3A4A"/><rect x="-4" y="-5" width="6" height="10" rx="1.5" fill="#E2622A"/></g>
+          <animateMotion dur="3.6s" begin="0.2s" fill="freeze" rotate="auto" path="${d}"/>
+          <animateTransform attributeName="transform" type="scale" values="0.45;1.9" dur="3.6s" begin="0.2s" fill="freeze" additive="sum"/></g>
+      </g>
+      <g class="ar-land">${landscape()}</g>`;
+    },
   },
 };
 
@@ -104,7 +148,7 @@ function landscape() {
     ${palm(880, 580, 1.15)}${palm(960, 590, .9)}${palm(90, 585, 1)}`;
 }
 
-export function playArrival(mode = 'train') {
+export function playArrival(mode = 'train', via = 'milan') {
   return new Promise(resolve => {
     const sc = SCENES[mode] || SCENES.train;
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -112,7 +156,7 @@ export function playArrival(mode = 'train') {
     ov.className = `arrival ar-${mode}${reduced ? ' still' : ''}`;
     ov.setAttribute('role', 'status');
     ov.innerHTML = `<svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${sc.svg()}</svg>
-      <p class="ar-cap"><span class="c1">${sc.caption[0]}</span><span class="c2">${sc.caption[1]}</span></p>
+      <p class="ar-cap"><span class="c1">${sc.caption(via)[0]}</span><span class="c2">${sc.caption(via)[1]}</span></p>
       <button class="btn small ghost ar-skip">Skip</button>`;
     document.body.appendChild(ov);
     let done = false;
@@ -123,6 +167,6 @@ export function playArrival(mode = 'train') {
     };
     ov.querySelector('.ar-skip').onclick = end;
     ov.querySelector('.ar-skip').focus({ preventScroll: true });
-    setTimeout(end, reduced ? 1800 : 4800);
+    setTimeout(end, reduced ? 1800 : sc.duration);
   });
 }

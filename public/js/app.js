@@ -459,7 +459,7 @@ function renderScene(id, sceneId) {
   // Lugano opens; only then does the panel ask what you do first
   if (id === 'arrive' && sceneId === 'arrived' && !s.flags.arrivalShown) {
     s.flags.arrivalShown = true; s.holdFog = true; saveGame();
-    return playArrival(s.flags.travelMode).then(() => {
+    return playArrival(s.flags.travelMode, s.flags.travelVia).then(() => {
       s.holdFog = false; log('lugano_unlocked', { mode: s.flags.travelMode, day: s.day });
       redraw(); renderScene(id, sceneId);
     });
@@ -961,7 +961,7 @@ function demoArrival(mode) {
   s.profile = { preset: p.id, name: p.name, flag: p.flag, origin: p.origin, visa: false, stay: p.stay, abroad: p.abroad };
   for (const id of ['accounts', 'usihome', 'roomhunt', 'courses']) s.steps[id] = { status: 'done' };
   s.steps.recognition = { status: 'waiting' }; s.waits.recognition = 2;
-  Object.assign(s.flags, { savedCreds: true, housing: 'sublet', ownerLetter: true, courses: ['daf', 'ie', 'dm'], travelMode: mode,
+  Object.assign(s.flags, { savedCreds: true, housing: 'sublet', ownerLetter: true, courses: ['daf', 'ie', 'dm'], travelMode: mode, travelVia: params.get('via') === 'zurich' ? 'zurich' : 'milan',
     travelNote: { train: 'Six hours of mountains and tunnels, right on time.', flight: 'Cheap flight, bus on time. Lucky you.', car: 'Your family carries the boxes and leaves you a full fridge.' }[mode] });
   s.day = -16; s.place = 'roomsearch';
   s.costs.push({ chf: 1400, why: 'Sublet: deposit and first month', kind: 'planned', day: -20 });
