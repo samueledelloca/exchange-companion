@@ -227,7 +227,7 @@ textarea { display: block; width: 100%; margin-top: 6px; font: inherit; border: 
   .brand span { display: none; }
   .hud { order: 3; flex-basis: 100%; }
   .tools { margin-left: auto; }
-  .panel { left: 0; right: 0; bottom: 0; top: auto; width: 100%; max-height: 78svh; border-radius: 20px 20px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  .panel { left: 0; right: 0; bottom: 0; top: auto; width: 100%; max-height: 60svh; border-radius: 20px 20px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
   .panel .choices { padding-bottom: 8px; }
   .panel.trip-panel { max-height: 46svh; }
   .legend { display: none; }
@@ -419,4 +419,36 @@ html, body { overscroll-behavior-y: none; }
   .tour-card p { font-size: .9rem; }
   .modal-card { padding: 16px 18px; }
   .cele-card { padding: 16px 24px; } .cele-stamp { width: 84px; height: 84px; font-size: 2.4rem; }
+}
+
+/* desktop: while a panel is open the map shrinks into the space left of it */
+@media (min-width: 721px) {
+  .mapwrap { transition: padding-right .25s ease; }
+  .screen.game:has(.panel:not([hidden])) .mapwrap { padding-right: calc(min(420px, 100% - 32px) + 24px); }
+}
+@media (max-height: 500px) and (pointer: coarse) and (min-width: 721px) {
+  .screen.game:has(.panel:not([hidden])) .mapwrap { padding-right: 0; }
+}
+
+/* immersive map on phones: the map fills the screen, the rest floats over it */
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .screen.game { display: block; position: fixed; inset: 0; height: auto; }
+  .mapwrap { position: absolute; inset: 0; padding: 0 !important; }
+  .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 6; background: transparent; border: 0; pointer-events: none;
+    padding: calc(8px + env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left)); gap: 6px; }
+  .topbar .brand { display: none; }
+  .hud { pointer-events: none; gap: 6px; }
+  .hud > *, .tools { pointer-events: auto; }
+  .chip { background: rgba(255,255,255,.93); border: 1px solid rgba(23,32,49,.12); box-shadow: 0 2px 8px rgba(23,32,49,.16); }
+  .stamps { background: rgba(255,255,255,.93); border: 1px solid rgba(23,32,49,.12); border-radius: 999px; padding: 3px 6px; box-shadow: 0 2px 8px rgba(23,32,49,.16); }
+  .stamp { width: 28px; height: 28px; font-size: .85rem; }
+  .tools .btn { box-shadow: 0 2px 8px rgba(23,32,49,.18); border: 1px solid rgba(23,32,49,.1); }
+  .tools .btn.ghost { background: rgba(255,255,255,.93); }
+  .mapctl { top: 50%; transform: translateY(-50%); right: max(10px, env(safe-area-inset-right)); }
+  .trip-banner { top: auto; bottom: 90px; }
+  .debug { top: auto; bottom: 0; }
+}
+#map .ground { fill: #EEF2F6; }
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  #map .ground { fill: #E6ECE0; }
 }

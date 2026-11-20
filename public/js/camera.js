@@ -15,13 +15,38 @@ let gesture = null, dragged = false, lastTap = 0, logTimer = 0, pendingLog = nul
 export const isPhone = () => window.innerWidth <= 720 || (window.innerHeight <= 500 && !!window.matchMedia?.('(pointer: coarse)').matches);
 
 function aspect() { return svg.clientWidth / Math.max(1, svg.clientHeight); }
-function hWhole() { return Math.max(MAP_H, MAP_W / aspect()); }
+// Furthest zoom-out on phones: the map covers the screen (no empty bands).
+// Portrait shows the full height, landscape the full width.
+function hWhole() { return Math.min(MAP_H, MAP_W / aspect()); }
+
+// Share of the map hidden by an open panel: the bottom sheet (portrait phones)
+// or the side column (landscape). Places are centred in what stays visible.
+function occlusion() {
+  const o = { l: 0, r: 0, t: 0, b: 0 };
+  if (!svg) return o;
+  const r = svg.getBoundingClientRect();
+  if (!r.width || !r.height) return o;
+  const cap = v => Math.min(Math.max(v, 0), 0.9);
+  // the floating top bar sits over the map on phones
+  const bar = document.querySelector('.topbar');
+  if (bar) { const b = bar.getBoundingClientRect(); if (b.bottom > r.top && b.top <= r.top + 4) o.t = cap((b.bottom - r.top) / r.height); }
+  const p = document.querySelector('#panel');
+  if (!p || p.hidden) return o;
+  const q = p.getBoundingClientRect();
+  // bottom sheet: (almost) full width; checked by width because the panel slides in sideways
+  if (q.top > r.top + 40 && q.width > r.width * 0.8) o.b = cap((r.bottom - q.top) / r.height);
+  else if (q.left > r.left + 40) o.r = cap((r.right - q.left) / r.width);
+  return o;
+}
 
 function clamp(c) {
   const h = Math.min(Math.max(c.h, H_MIN), hWhole());
-  const w = h * aspect();
-  const cx = w >= MAP_W ? MAP_W / 2 : Math.min(Math.max(c.cx, w / 2), MAP_W - w / 2);
-  const cy = h >= MAP_H ? MAP_H / 2 : Math.min(Math.max(c.cy, h / 2), MAP_H - h / 2);
+  const w = h * aspect(), o = occlusion();
+  const oL = o.l * w, oR = o.r * w, oT = o.t * h, oB = o.b * h;
+  const visW = w - oL - oR, visH = h - oT - oB;
+  // the map may slide under the panel, but never leave the visible part empty
+  const cx = visW >= MAP_W ? MAP_W / 2 + w / 2 - oL - visW / 2 : Math.min(Math.max(c.cx, w / 2 - oL), MAP_W - w / 2 + oR);
+  const cy = visH >= MAP_H ? MAP_H / 2 + h / 2 - oT - visH / 2 : Math.min(Math.max(c.cy, h / 2 - oT), MAP_H - h / 2 + oB);
   return { cx, cy, h };
 }
 
@@ -139,7 +164,13 @@ export function follow(x, y, h = H_FOLLOW) {
   if (!svg || !isPhone()) return;
   // keep a closer zoom if the participant chose one, otherwise come in to the readable zoom
   // in landscape the screen is wide: also cap the visible width at about 640 map units
-  glide({ cx: x, cy: y, h: Math.min(cam.h, h, 640 / aspect()) });
+  const nh = Math.min(cam.h, h, 640 / aspect()), w = nh * aspect(), o = occlusion();
+  // put the place in the middle of the part of the map that is not under a panel
+  const fx = o.l + (1 - o.l - o.r) / 2, fy = o.t + (1 - o.t - o.b) / 2;
+  glide({ cx: x - (fx - 0.5) * w, cy: y - (fy - 0.5) * nh, h: nh });
 }
+
+// After a panel closes: slide back inside the map if the view hung under the panel.
+export function settle() { if (svg && isPhone()) glide({ ...cam }, 300); }
 
 export function whole() { if (svg && isPhone()) glide({ cx: MAP_W / 2, cy: MAP_H / 2, h: hWhole() }); }

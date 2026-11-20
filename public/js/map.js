@@ -16,6 +16,7 @@ export function baseMap() {
       <rect width="14" height="8" fill="none"/><rect x="5" y="0" width="3" height="8" fill="#8A8F98"/>
     </pattern>
   </defs>
+  <rect x="-2000" y="-2000" width="5000" height="4620" class="ground"/>
   <rect x="0" y="0" width="1000" height="620" fill="#EEF2F6"/>
   <g clip-path="url(#frame)">
     <rect x="230" y="18" width="762" height="584" fill="#EDF1E4"/>
@@ -35,7 +36,7 @@ export function baseMap() {
     <text x="700" y="540" class="maplabel lakelabel" text-anchor="middle">Lago di Lugano</text>
     <text x="986" y="596" class="osm" text-anchor="end">© OpenStreetMap contributors</text>
   </g>
-  <rect x="230" y="18" width="762" height="584" rx="18" fill="none" stroke="#C9D3DF" stroke-width="1.5"/>
+  <rect class="frame" x="230" y="18" width="762" height="584" rx="18" fill="none" stroke="#C9D3DF" stroke-width="1.5"/>
   <!-- home region -->
   <rect x="18" y="40" width="190" height="540" rx="22" fill="#E3E9F4" stroke="#B9C6DE" stroke-width="2" stroke-dasharray="6 6"/>
   <text x="113" y="76" class="maplabel region" text-anchor="middle">Home</text>
