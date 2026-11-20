@@ -487,3 +487,9 @@ button.chip.role:hover { border-color: var(--accent); }
 .rolecard h2 { margin: 0; }
 .rolecard p { margin: 2px 0 0; }
 .role-flag { font-size: 2.6rem; line-height: 1; }
+/* possible homes before you have a room */
+.homemark circle { fill: rgba(255,255,255,.85); stroke: #D46A43; stroke-width: 2; stroke-dasharray: 4 3; }
+.homemark .hicon { font-size: 14px; }
+.homemark .hlabel { font: 700 11px 'Plus Jakarta Sans', sans-serif; fill: #8A4A2E; paint-order: stroke; stroke: #EDF1E4; stroke-width: 3px; }
+.homemark .hnote { font: 600 9.5px 'Plus Jakarta Sans', sans-serif; fill: #6F7A8C; paint-order: stroke; stroke: #EDF1E4; stroke-width: 3px; }
+#map.viewing-trip #homes { opacity: .28; }

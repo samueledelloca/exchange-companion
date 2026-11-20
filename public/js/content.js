@@ -20,20 +20,29 @@ export const AREAS = {
 
 // Places on the map (viewBox 1000 x 620).
 export const PLACES = {
-  laptop:    { x: 112, y: 150, label: 'Your desk at home',  icon: '💻' },
-  embassy:   { x: 112, y: 300, label: 'Swiss embassy',      icon: '🛂' },
-  mailbox0:  { x: 112, y: 450, label: 'USI Home portal',    icon: '📝' },
+  laptop:    { x: 112, y: 140, label: 'Your desk at home',  icon: '💻' },
+  embassy:   { x: 112, y: 255, label: 'Swiss embassy',      icon: '🛂' },
+  mailbox0:  { x: 112, y: 370, label: 'USI Home portal',    icon: '📝' },
+  roomsearch:{ x: 112, y: 485, label: 'Room search online', icon: '🔎' },
   station:   { x: 356, y: 340, label: 'Lugano station',     icon: '🚉' },
   campus:    { x: 560, y: 214, label: 'USI campus',         icon: '🎓' },
   office:    { x: 684, y: 206,  label: 'Exchange office',    icon: '📑' },
-  houses:    { x: 780, y: 104,  label: 'Viganello & Molino Nuovo', icon: '🏘️' },
-  busstop:   { x: 604, y: 318, label: 'Bus stop',           icon: '🚌' },
+  busstop:   { x: 664, y: 320, label: 'Bus stop',           icon: '🚌' },
   municipio: { x: 522, y: 422, label: 'Punto Città',        icon: '🏛️' },
   canton:    { x: 286, y: 430, label: 'Cantonal office',    icon: '🪪' },
   post:      { x: 432, y: 398, label: 'Post office',        icon: '📮' },
+  // "Your mailbox" moves to wherever you end up living (set by the engine)
   home2:     { x: 800, y: 330, label: 'Your mailbox',       icon: '📬' },
   lake:      { x: 650, y: 424, label: 'Lakefront',          icon: '🌅' },
   viewpoint: { x: 940, y: 236, label: 'Monte Brè',          icon: '⛰️' },
+};
+
+// Where you can end up living: real locations (OpenStreetMap). Only one becomes
+// yours; the others disappear from the map once you have a room.
+export const HOMES = {
+  usihome: { x: 548, y: 296, name: 'USI Home', note: 'student residence, Via Lambertenghi', home2: 'Your room at USI Home' },
+  lease:   { x: 466, y: 168, name: 'Molino Nuovo', note: 'one-year lease', home2: 'Your flat, Molino Nuovo' },
+  sublet:  { x: 786, y: 111, name: 'Viganello', note: 'sublet for one semester', home2: 'Your room, Viganello' },
 };
 
 // Illustrative tips from past students. Names are invented; situations come
@@ -228,7 +237,7 @@ export const STEPS = [
     },
   },
   {
-    id: 'roomhunt', area: 'housing', place: 'houses', title: 'Find a room', mandatory: true,
+    id: 'roomhunt', area: 'housing', place: 'roomsearch', title: 'Find a room', mandatory: true,
     requires: ['usihome'], when: s => s.flags.housing !== 'usihome' || s.steps.roomhunt?.status === 'done',
     scenes: {
       start: c => ({
@@ -542,7 +551,7 @@ export const STEPS = [
   },
   {
     id: 'surprise', area: 'everyday', place: 'home2', title: 'A letter you did not expect', mandatory: true,
-    requires: ['register'],
+    requires: ['register'], when: s => !!s.flags.housing || s.steps.surprise?.status === 'done',
     scenes: {
       start: () => ({
         text: 'A bill arrives: 335 CHF a year for the radio and TV fee (Serafe). You don\'t even own a TV.',

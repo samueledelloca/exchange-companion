@@ -1,5 +1,5 @@
 // The illustrated map: Lugano on the right, your home on the left.
-import { PLACES, AREAS } from './content.js';
+import { PLACES, AREAS, HOMES } from './content.js';
 import { GEO } from './geo.js';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -44,6 +44,7 @@ export function baseMap() {
   <text x="113" y="560" class="maplabel soft" text-anchor="middle">before departure</text>
   <!-- the journey from home -->
   <path d="M208 150 C270 160 300 290 330 326" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
+  <g id="homes"></g>
   <g id="edges"></g>
   <g id="trail"></g>
   <g id="nodes"></g>
@@ -83,6 +84,17 @@ export function drawMap(svg, steps, state, visible, onOpen) {
       if (cls === 'edge next') edges.appendChild(el('path', { d, class: 'edge casing' }));
       edges.appendChild(el('path', { d, class: cls }));
     }
+  }
+  // possible homes: faint until you have a room; then only yours stays (as your mailbox step)
+  const homes = svg.querySelector('#homes');
+  homes.innerHTML = '';
+  if (!state.flags.housing) for (const h of Object.values(HOMES)) {
+    const g = el('g', { class: 'homemark', transform: `translate(${h.x} ${h.y})` });
+    g.appendChild(el('circle', { r: 15 }));
+    g.appendChild(el('text', { 'text-anchor': 'middle', y: 6, class: 'hicon' }, '🏠'));
+    g.appendChild(el('text', { 'text-anchor': 'middle', y: 31, class: 'hlabel' }, h.name));
+    g.appendChild(el('text', { 'text-anchor': 'middle', y: 44, class: 'hnote' }, h.note));
+    homes.appendChild(g);
   }
   for (const st of vis) {
     const p = PLACES[st.place];

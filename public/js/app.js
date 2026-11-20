@@ -1,5 +1,5 @@
 // Exchange Companion: game engine, screens, buddy, logging hooks.
-import { BUDDY, AREAS, PLACES, STEPS, TIPS, TRIPS, PRESETS, MEMES, WHY_CHIPS, UEQS, TAILORED } from './content.js';
+import { BUDDY, AREAS, PLACES, HOMES, STEPS, TIPS, TRIPS, PRESETS, MEMES, WHY_CHIPS, UEQS, TAILORED } from './content.js';
 import { CONFIG } from './config.js';
 import { session, log, send, download, continueClock, viewport } from './logger.js';
 import { baseMap, drawMap, drawAvatar, drawTrail, statusText } from './map.js';
@@ -40,6 +40,9 @@ const visible = st => !st.when || st.when(s);
 const satisfied = id => { const st = byId(id); return !st || !visible(st) || s.steps[id]?.status === 'done'; };
 
 function refresh() {
+  // your mailbox is wherever you live
+  const h = HOMES[s.flags.housing];
+  if (h) Object.assign(PLACES.home2, { x: h.x, y: h.y, label: h.home2 });
   for (const st of STEPS) {
     const cur = s.steps[st.id] || (s.steps[st.id] = { status: 'locked' });
     if (cur.status === 'locked' || cur.status === 'open') cur.status = st.requires.every(satisfied) ? 'open' : 'locked';
