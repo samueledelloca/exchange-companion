@@ -40,7 +40,7 @@ export const PLACES = {
 // Where you can end up living: real locations (OpenStreetMap). Only one becomes
 // yours; the others disappear from the map once you have a room.
 export const HOMES = {
-  usihome: { x: 548, y: 296, name: 'USI Home', note: 'student residence, Via Lambertenghi', home2: 'Your room at USI Home' },
+  usihome: { x: 548, y: 296, name: 'USI Home', note: 'student residence', home2: 'Your room at USI Home' },
   lease:   { x: 466, y: 168, name: 'Molino Nuovo', note: 'one-year lease', home2: 'Your flat, Molino Nuovo' },
   sublet:  { x: 786, y: 111, name: 'Viganello', note: 'sublet for one semester', home2: 'Your room, Viganello' },
 };
