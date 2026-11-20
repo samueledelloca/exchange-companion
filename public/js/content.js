@@ -20,16 +20,17 @@ export const AREAS = {
 
 // Places on the map (viewBox 1000 x 620).
 export const PLACES = {
-  laptop:    { x: 112, y: 140, label: 'Your desk at home',  icon: '💻' },
-  embassy:   { x: 112, y: 255, label: 'Swiss embassy',      icon: '🛂' },
-  mailbox0:  { x: 112, y: 370, label: 'USI Home portal',    icon: '📝' },
-  roomsearch:{ x: 112, y: 485, label: 'Room search online', icon: '🔎' },
+  // Home = everything done before departure, online or with the home university
+  laptop:    { x: 82,  y: 150, label: 'Your desk',        icon: '💻' },
+  embassy:   { x: 232, y: 150, label: 'Swiss embassy',    icon: '🛂' },
+  mailbox0:  { x: 82,  y: 315, label: 'USI Home portal',  icon: '📝' },
+  roomsearch:{ x: 232, y: 315, label: 'Room search',      icon: '🔎' },
+  courseportal:{ x: 82, y: 480, label: 'Course catalogue', icon: '📚' },
+  homeuni:   { x: 232, y: 480, label: 'Home university',  icon: '🏫' },
   station:   { x: 356, y: 340, label: 'Lugano station',     icon: '🚉' },
   campus:    { x: 560, y: 214, label: 'USI campus',         icon: '🎓' },
-  office:    { x: 684, y: 206,  label: 'Exchange office',    icon: '📑' },
-  busstop:   { x: 664, y: 320, label: 'Bus stop',           icon: '🚌' },
   municipio: { x: 522, y: 422, label: 'Punto Città',        icon: '🏛️' },
-  canton:    { x: 286, y: 430, label: 'Cantonal office',    icon: '🪪' },
+  canton:    { x: 360, y: 462, label: 'Cantonal office',    icon: '🪪' },
   post:      { x: 432, y: 398, label: 'Post office',        icon: '📮' },
   // "Your mailbox" moves to wherever you end up living (set by the engine)
   home2:     { x: 800, y: 330, label: 'Your mailbox',       icon: '📬' },
@@ -467,7 +468,7 @@ export const STEPS = [
     },
   },
   {
-    id: 'courses', area: 'study', place: 'campus', title: 'Build your study plan', mandatory: true,
+    id: 'courses', area: 'study', place: 'courseportal', title: 'Build your study plan', mandatory: true,
     requires: ['accounts'],
     scenes: {
       start: c => c.s.flags.savedCreds === false && !c.s.flags.credsRecovered ? {
@@ -506,7 +507,7 @@ export const STEPS = [
     },
   },
   {
-    id: 'recognition', area: 'study', place: 'office', title: 'Get your courses recognised', mandatory: true,
+    id: 'recognition', area: 'study', place: 'homeuni', title: 'Get your courses recognised', mandatory: true,
     requires: ['courses'], waitSteps: 2,
     scenes: {
       start: () => ({
@@ -535,7 +536,7 @@ export const STEPS = [
     },
   },
   {
-    id: 'transport', area: 'everyday', place: 'busstop', title: 'Take the bus to campus', mandatory: true,
+    id: 'transport', area: 'everyday', place: 'campus', title: 'Take the bus to campus', mandatory: true,
     requires: ['arrive'],
     scenes: {
       start: () => ({

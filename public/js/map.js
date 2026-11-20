@@ -39,11 +39,11 @@ export function baseMap() {
     <text x="986" y="596" class="osm" text-anchor="end">© OpenStreetMap contributors</text>
   </g>
   <!-- home region -->
-  <rect x="18" y="40" width="190" height="540" rx="22" fill="#E3E9F4" fill-opacity=".93" stroke="#B9C6DE" stroke-width="2" stroke-dasharray="6 6"/>
-  <text x="113" y="76" class="maplabel region" text-anchor="middle">Home</text>
-  <text x="113" y="560" class="maplabel soft" text-anchor="middle">before departure</text>
+  <rect x="12" y="22" width="292" height="580" rx="22" fill="#E3E9F4" fill-opacity=".93" stroke="#B9C6DE" stroke-width="2" stroke-dasharray="6 6"/>
+  <text x="158" y="58" class="maplabel region" text-anchor="middle">Home</text>
+  <text x="158" y="588" class="maplabel soft" text-anchor="middle">before departure</text>
   <!-- the journey from home -->
-  <path d="M208 150 C270 160 300 290 330 326" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
+  <path d="M304 300 C318 310 326 318 334 326" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
   <g id="homes"></g>
   <g id="edges"></g>
   <g id="trail"></g>
