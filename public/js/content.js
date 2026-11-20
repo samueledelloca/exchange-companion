@@ -239,6 +239,9 @@ export const STEPS = [
           { id: 'interest', label: 'Registering interest is enough', go: c => {
               c.days(3); c.set('housing', null); c.problem('no-usihome');
               return { end: 'done', mood: 'oops', note: 'Registering interest was not an application. By the time you check, USI Home is full.' }; } },
+          { id: 'private', label: 'Skip USI Home, I would rather find my own place', go: c => {
+              c.days(1); c.set('housing', null); c.set('optedPrivate', true);
+              return { end: 'done', mood: 'win', note: 'Your call: a room or a flat of your own. On to the room search.' }; } },
         ],
       }),
     },
