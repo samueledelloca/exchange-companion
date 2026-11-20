@@ -57,3 +57,12 @@ npx wrangler d1 execute exchange-companion --remote --command "DELETE FROM snaps
 ```
 
 Then delete any local copy too (`data/`, re-export). Sessions recorded before 2026-11-20 have no code.
+
+## Automatic publishing from GitHub
+
+`.github/workflows/deploy.yml` runs `scripts/deploy.sh` on every push to `main` that touches
+the app, so edits made from a cloud Claude Code session or the GitHub website go live without
+a laptop. It needs two repository secrets: `CLOUDFLARE_API_TOKEN` (a Cloudflare API token
+with the permission Account, Cloudflare Pages, Edit) and `CLOUDFLARE_ACCOUNT_ID`.
+To roll back, open the Pages project in the Cloudflare dashboard, Deployments, and use
+"Rollback to this deployment" on an earlier one.
