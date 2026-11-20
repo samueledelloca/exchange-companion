@@ -100,11 +100,12 @@ function consent() {
         <li>Now and then, why you chose something (always optional).</li>
         <li>Your answers to a short questionnaire at the end, with a few optional questions about you in broad categories (age range, region, field).</li>
         <li>No name, no email, nothing that identifies you.</li>
-        <li>You can stop at any moment, just close the page.</li>
+        <li>You can stop at any moment, just close the page. You can also ask us to delete your data later.</li>
       </ul>
       <details>
         <summary>Read the boring details</summary>
-        <p>This prototype is part of a student project in the UX Design course at USI (Università della Svizzera italiana). We use the data only to evaluate and improve the design, and report it only in aggregate form in our course reports. Each session gets a random code; we do not store your IP address in the results. The data is kept until the course ends and then deleted. Participation is voluntary and you must be 18 or older. Questions: ${CONFIG.CONTACT}.</p>
+        <p>This prototype is part of a student project in the UX Design course at USI (Università della Svizzera italiana). We use the data only to evaluate and improve the design, and report it only in aggregate form in our course reports. We do not store your IP address in the results. The data is kept until the course ends and then deleted. Participation is voluntary and you must be 18 or older.</p>
+        <p><b>Your participant code is ${session.code}.</b> You will see it again at the end and under "My steps". If you change your mind, even after finishing, email <a href="mailto:${CONFIG.CONTACT_EMAIL}?subject=Exchange%20Companion%20withdrawal%20${session.code}">${CONFIG.CONTACT_EMAIL}</a> with this code and we will delete your data. Questions go to the same address (${CONFIG.CONTACT}).</p>
       </details>
       <div class="actions">
         <button class="btn primary" id="yes">I accept, let's go</button>
@@ -618,7 +619,8 @@ function openList() {
     </ul></section>`;
   }).join('');
   const nx = s.next ? byId(s.next) : null;
-  modal(`<h2>My steps</h2>${nx ? `<p class="next">Suggested next: <button class="btn-link" data-open="${nx.id}">${nx.title}</button></p>` : ''}${groups}`, 'My steps');
+  modal(`<h2>My steps</h2>${nx ? `<p class="next">Suggested next: <button class="btn-link" data-open="${nx.id}">${nx.title}</button></p>` : ''}${groups}
+    <p class="muted small code-line">Your participant code: <b>${session.code}</b>. To withdraw your data, email it to ${CONFIG.CONTACT_EMAIL}.</p>`, 'My steps');
   document.querySelectorAll('#modal [data-open]').forEach(b => b.onclick = () => { log('list_pick', { step: b.dataset.open }); closeModal(); openStep(b.dataset.open); });
 }
 
@@ -786,6 +788,7 @@ function thanks(sent) {
     <h1>Grazie mille!</h1>
     <p class="bubble big">${line}</p>
     <p class="muted">${sent ? 'Your answers are saved. You can close this page now.' : 'You can close this page now.'}</p>
+    <p class="codebox">Your participant code: <b>${session.code}</b><br><span class="muted small">Changed your mind? Email this code to <a href="mailto:${CONFIG.CONTACT_EMAIL}?subject=Exchange%20Companion%20withdrawal%20${session.code}">${CONFIG.CONTACT_EMAIL}</a> and we will delete your data.</span></p>
     ${sent ? '' : `<details class="fallback"><summary>The answers could not be sent online</summary>
       <p>If someone from our team is with you, they may ask you to save this file.</p>
       <button class="btn ghost small" id="dl">Save the session file</button></details>`}</main>`, 'center');

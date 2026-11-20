@@ -24,4 +24,5 @@ export const CONFIG = {
 
   // Contact shown in the consent text.
   CONTACT: 'USI UX Design course, Group 6',
+  CONTACT_EMAIL: 'samuele.delloca@supsi.ch', // withdrawal requests and questions
 };

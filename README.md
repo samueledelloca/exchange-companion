@@ -100,7 +100,7 @@ and `data/all.jsonl`; online, the snapshots go to D1 and `scripts/export.sh` wri
 same `data/all.jsonl`. **Keep the last snapshot per `id`.** Nothing is sent before consent.
 No IP address and no name are stored.
 
-A snapshot contains `id`, `round`, `startedAt`, `variant` (buddy, tips, seed,
+A snapshot contains `id`, `code` (the short participant code shown to them, for withdrawal requests: see `DEPLOY.md`), `round`, `version`, `startedAt`, `variant` (buddy, tips, seed,
 statusStyle), `events` (type, `t` in ms since load, and details) and `answers`. The
 main event types are:
 

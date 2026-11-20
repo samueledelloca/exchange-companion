@@ -41,3 +41,14 @@ npx wrangler d1 execute exchange-companion --remote --file schema.sql
 npx wrangler pages project create exchange-companion --production-branch main
 npx wrangler pages deploy --branch main
 ```
+
+## Withdrawal requests
+
+Participants see a code like `EC-7K3QF2` (consent details, "My steps", final page). To delete
+everything recorded for that code:
+
+```bash
+npx wrangler d1 execute exchange-companion --remote --command "DELETE FROM snapshots WHERE json_extract(payload, '$.code') = 'EC-7K3QF2'"
+```
+
+Then delete any local copy too (`data/`, re-export). Sessions recorded before 2026-11-20 have no code.

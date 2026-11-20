@@ -3,8 +3,17 @@
 import { CONFIG } from './config.js';
 
 const t0 = performance.now();
+
+// Short participant code, shown to the participant so they can ask to withdraw.
+// No 0/O/1/I to avoid misreading.
+function shortCode() {
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const r = crypto.getRandomValues ? crypto.getRandomValues(new Uint8Array(6)) : Array.from({ length: 6 }, () => Math.random() * 256);
+  return 'EC-' + Array.from(r, x => A[x % A.length]).join('');
+}
 export const session = {
   id: (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)),
+  code: shortCode(),
   round: CONFIG.STUDY_ROUND,
   version: CONFIG.VERSION,
   startedAt: new Date().toISOString(),
