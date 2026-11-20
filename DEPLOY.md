@@ -23,10 +23,13 @@ Before each test round, set `STUDY_ROUND` in `public/js/config.js`
 ## Get the data
 
 ```bash
-./scripts/export.sh      # writes data/all.jsonl and data/last.jsonl (last snapshot per session)
+./scripts/export.sh      # writes data/all.jsonl, data/last.jsonl, data/sessions.csv, data/events.csv
 ```
 
-`data/` is git-ignored: recordings never go to the repository.
+`sessions.csv` has one row per participant (variants, profile, totals, problems by cause,
+background, UEQ-S items and scale scores on -3..+3, tailored items, open answers);
+`events.csv` has one row per event with the details as JSON. For local server data run
+`python3 scripts/to_csv.py`. `data/` is git-ignored: recordings never go to the repository.
 
 ## Checks
 

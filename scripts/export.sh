@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Download every recorded snapshot from Cloudflare D1 into data/all.jsonl
-# (same format as server.py), plus data/last.jsonl with the last snapshot per session.
+# (same format as server.py), data/last.jsonl with the last snapshot per session,
+# and data/sessions.csv + data/events.csv for analysis (scripts/to_csv.py).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p data
@@ -19,3 +20,4 @@ with open('data/last.jsonl', 'w') as f:
 print(f"{len(rows)} snapshots, {len(last)} sessions -> data/all.jsonl, data/last.jsonl")
 PY
 rm data/_d1.json
+python3 scripts/to_csv.py data/all.jsonl
