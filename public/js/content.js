@@ -104,7 +104,7 @@ export const TRIPS = [
       ['courses', 'win', 'Study plan sent.'],
       ['permit', 'meh', 'Submitted, then waited.'],
       ['insurance', 'oops', 'Postponed the exemption letter. Posted it just in time.'],
-      ['transport', 'oops', 'Cheapest ticket, wrong zone: 90 CHF surcharge.'],
+      ['transport', 'oops', 'Cheapest ticket, wrong zone: about 80 CHF of surcharge and fare.'],
       ['recognition', 'win', 'Approved.'],
       ['surprise', 'oops', 'Ignored the Serafe bill. Paid a reminder fee.'],
       ['permit', 'win', 'Biometrics done.'],
@@ -148,7 +148,8 @@ export const MEMES = {
 // about 650 CHF/month, private rooms 650-700, deposit up to 3 months on a lease,
 // train from Germany about 130, Swiss national visa about 80, permit and
 // biometrics about 100, Swisscare-type student insurance 80-95 CHF/month,
-// Arcobaleno student monthly pass about 55, fare-dodging surcharge 90, taxi
+// Arcobaleno student monthly pass about 55, surcharge for a partially valid
+// ticket (wrong zones) about 75 plus the fare (75 in Zurich, 105 in Lausanne; Ticino not found), taxi
 // Malpensa-Lugano about 160, Serafe 335 a year per household.
 // PROBLEM CAUSES. c.problem(id, cause): 'choice' (default) follows from what the
 // participant chose, 'random' from the dice, 'forced' from the rule that every
@@ -306,13 +307,13 @@ export const STEPS = [
       arrived: c => ({
         text: `${c.s.flags.travelNote} Palm trees, the lake, the mountains. ${c.s.flags.housing ? 'You have the keys to your room.' : 'With no room yet, you book a hostel for the first nights (about 300 CHF).'} What do you do first?`,
         choices: [
-          { id: 'lake', label: 'Drop the bags and walk to the lake', go: c => land(c, 'Welcome to Lugano! Remember: register at Punto Città within 14 days.') },
+          { id: 'lake', label: 'Drop the bags and walk to the lake', go: c => land(c, 'Welcome to Lugano! Remember: register at Punto Città within 8 days.') },
           { id: 'quiz', label: 'Ask the companion what the first two weeks look like', go: () => 'quiz' },
           { id: 'sim', label: 'Buy a Swiss SIM card at the station (about 25 CHF)', go: c => { c.set('swissPhone', true); c.spend(25, 'Swiss SIM card'); return land(c, 'Swiss number sorted: landlords and offices stop asking for one.'); } },
         ],
       }),
       quiz: () => ({
-        text: 'Quick check first. Which of these must you do <b>within 14 days</b> of arriving?',
+        text: 'Quick check first. Which of these must you do <b>within 8 days</b> of arriving?',
         multi: [
           { id: 'register', label: 'Register at Punto Città' },
           { id: 'bank', label: 'Open a Swiss bank account' },
@@ -323,8 +324,8 @@ export const STEPS = [
           const right = sel.length === 1 && sel[0] === 'register';
           c.log('quiz', { step: 'arrive', selected: sel, correct: right });
           return land(c, right
-            ? 'Exactly. Only the registration has the 14-day deadline, and your permit starts from there.'
-            : 'Only the registration at Punto Città has the 14-day deadline. Your permit starts from there; the rest can wait.', right ? 'win' : 'meh');
+            ? 'Exactly. Register at Punto Città within 8 days, then start the residence permit online within 14 days.'
+            : 'The one with the 8-day deadline is the registration at Punto Città. Then the residence permit, online, within 14 days. The rest can wait.', right ? 'win' : 'meh');
         },
       }),
     },
@@ -334,7 +335,7 @@ export const STEPS = [
     requires: ['arrive', 'roomhunt'],
     scenes: {
       start: c => ({
-        text: 'Every new resident must register at Punto Città, the city\'s service point, within 14 days of arrival. Before you go:',
+        text: 'Every new resident must register at Punto Città, the city\'s service point, within 8 days of arrival. Before you go:',
         tips: 'register', why: true,
         choices: [
           { id: 'checklist', label: 'Open the companion\'s checklist for my situation', go: c => { c.set('usedChecklist', true); return 'checklist'; } },
@@ -344,7 +345,7 @@ export const STEPS = [
       checklist: c => ({
         text: `Your checklist (${c.s.flags.housing === 'sublet' ? 'subtenant' : c.s.flags.housing === 'usihome' ? 'USI Home resident' : 'main tenant'}):<ul class="checklist">
           <li>Passport or ID card</li><li>Rental contract${c.s.flags.housing === 'sublet' ? ' <b>and a letter from the owner</b>' : ''}</li>
-          <li>USI enrolment certificate</li><li>One passport photo</li></ul>
+          </ul><p class="small muted">Your USI enrolment certificate and the photo are for the residence permit, not for this counter.</p>
           <button class="btn-link" data-action="counter-card">Show the counter card in Italian</button>`,
         choices: [{ id: 'go', label: 'Got it, choose what to bring', go: () => 'bring' }],
       }),
@@ -362,7 +363,7 @@ export const STEPS = [
         ],
         submit: (c, sel) => {
           c.set('lastBring', sel);
-          const need = ['id', 'contract', 'cert', 'photo'];
+          const need = ['id', 'contract'];
           if (c.s.flags.housing === 'sublet') need.push('owner');
           const missing = need.filter(n => !sel.includes(n));
           c.days(1); c.count('counterVisits');
@@ -391,7 +392,7 @@ export const STEPS = [
     requires: ['register'], waitSteps: 3,
     scenes: {
       start: () => ({
-        text: 'The cantonal permit application is an online form in Italian.',
+        text: 'The residence permit application is an online form of the cantonal migration office, in Italian. You attach a copy of your ID, the arrival notification from Punto Città, your USI enrolment certificate and the lease, all in Italian, within 14 days of arrival.',
         tips: 'permit', why: true,
         choices: [
           { id: 'guide', label: 'Use the companion\'s line-by-line guide', go: c => { c.days(1); return { end: 'wait', mood: 'win', note: 'Submitted. Then... silence.' }; } },
@@ -532,7 +533,7 @@ export const STEPS = [
         text: 'The ticket machine shows zones, ticket types and an Arcobaleno pass. Your first lecture is in 20 minutes.',
         tips: 'transport', why: true,
         choices: [
-          { id: 'cheap', label: 'Buy the cheapest single ticket (2.30 CHF)', go: c => { c.spend(2, 'Single bus ticket'); c.cost(90, 'Surcharge: wrong zone'); c.problem('fine'); c.days(1); return { end: 'done', mood: 'oops', note: 'Ticket check. Wrong zone: 90 CHF surcharge.' }; } },
+          { id: 'cheap', label: 'Buy the cheapest single ticket (2.30 CHF)', go: c => { c.spend(2, 'Single bus ticket'); c.cost(78, 'Surcharge for a partially valid ticket, plus the fare'); c.problem('fine'); c.days(1); return { end: 'done', mood: 'oops', note: 'Ticket check. Your ticket does not cover this zone, so it counts as partially valid: a surcharge plus the missing fare, about 80 CHF.' }; } },
           { id: 'ask', label: 'Check the companion: which zones do I need?', go: c => { c.spend(3, 'Bus ticket, right zones'); c.days(1); return { end: 'done', mood: 'win', note: 'Right ticket, on time for class.' }; } },
           { id: 'pass', label: 'Buy a monthly student pass (about 55 CHF)', go: c => { c.spend(55, 'Monthly student bus pass'); c.days(1); return { end: 'done', mood: 'win', note: 'Pass bought. No more machines this month.' }; } },
         ],
