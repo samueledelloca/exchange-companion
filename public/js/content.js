@@ -241,7 +241,7 @@ export const STEPS = [
               return { end: 'done', mood: 'oops', note: 'Registering interest was not an application. By the time you check, USI Home is full.' }; } },
           { id: 'private', label: 'Skip USI Home, I would rather find my own place', go: c => {
               c.days(1); c.set('housing', null); c.set('optedPrivate', true);
-              return { end: 'done', mood: 'win', note: 'Your call: a room or a flat of your own. On to the room search.' }; } },
+              return { end: 'done', mood: 'win', note: 'Your call: a room or a flat of your own. On to the room search.', meme: ['Everyone: "just take the student residence"', 'Me: has opinions about my own kitchen'] }; } },
         ],
       }),
     },
@@ -486,8 +486,8 @@ export const STEPS = [
         text: 'As a non-EU student you cannot get the exemption. You need a student health insurance (for example Swisscare), bought online.',
         why: true,
         choices: [
-          { id: 'buy', label: 'Buy the first one online now (about 95 CHF a month)', go: c => { c.days(1); c.spend(95 * (c.s.profile.stay === 'year' ? 12 : 6), 'Student health insurance'); return { end: 'done', mood: 'win', note: 'Done in ten minutes. The easiest procedure of the lot.' }; } },
-          { id: 'compare', label: 'Compare a few options first', go: c => { c.days(3); c.spend(80 * (c.s.profile.stay === 'year' ? 12 : 6), 'Student health insurance'); return { end: 'done', mood: 'win', note: 'Compared and bought one for about 80 CHF a month. Insured, and cheaper.' }; } },
+          { id: 'buy', label: 'Buy the first one online now (about 95 CHF a month)', go: c => { c.days(1); c.spend(95 * (c.s.profile.stay === 'year' ? 12 : 6), 'Student health insurance'); return { end: 'done', mood: 'win', note: 'Done in ten minutes. The easiest procedure of the lot.', meme: ['Swiss health insurance, bought online', 'in ten minutes. Suspiciously easy.'] }; } },
+          { id: 'compare', label: 'Compare a few options first', go: c => { c.days(3); c.spend(80 * (c.s.profile.stay === 'year' ? 12 : 6), 'Student health insurance'); return { end: 'done', mood: 'win', note: 'Compared and bought one for about 80 CHF a month. Insured, and cheaper.', meme: ['Compared three insurances', 'Saved enough for a lot of gelato'] }; } },
         ],
       },
       later: () => ({
@@ -588,7 +588,7 @@ export const STEPS = [
         tips: 'surprise', why: true,
         choices: [
           { id: 'ignore', label: 'Ignore it, it must be a mistake', go: c => { serafe(c); c.cost(20, 'Serafe reminder fee'); c.problem('ignored-bill'); return { end: 'done', mood: 'oops', note: 'A reminder arrives with a fee. It was not a mistake: the fee is per household, TV or not.' }; } },
-          { id: 'guide', label: 'Look it up in the companion\'s money guide', go: c => { const paid = serafe(c); return { end: 'done', mood: paid ? 'meh' : 'win', note: paid ? `It is per household, TV or not. ${c.s.flags.housing === 'lease' ? 'The flat is yours, so the bill is too.' : 'You split it with your flatmates.'}` : 'USI Home counts as a collective household: the residence pays, not you.' }; } },
+          { id: 'guide', label: 'Look it up in the companion\'s money guide', go: c => { const paid = serafe(c); return { end: 'done', mood: paid ? 'meh' : 'win', note: paid ? `It is per household, TV or not. ${c.s.flags.housing === 'lease' ? 'The flat is yours, so the bill is too.' : 'You split it with your flatmates.'}` : 'USI Home counts as a collective household: the residence pays, not you.', meme: paid ? undefined : ['USI Home: "Serafe? We pay it."', 'Me: best residence ever'] }; } },
         ],
       }),
     },

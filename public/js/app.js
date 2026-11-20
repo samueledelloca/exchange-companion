@@ -616,13 +616,15 @@ function finishStep(id, res) {
       <div class="microq studyq" id="microq" data-step="${id}" data-style="${style}"><p class="studytag">📋 Study question, outside the game</p><p>Do you know what to do next here?</p>
       <button class="chipbtn" data-q="yes">Yes</button><button class="chipbtn" data-q="unsure">Not sure</button><button class="chipbtn" data-q="no">No</button></div>`;
   }
-  const meme = playful() && res.mood === 'win' && MEMES[id] && status === 'done';
+  // an outcome can bring its own meme (res.meme) or none (res.meme === false)
+  const memePair = res.meme === false ? null : (res.meme || MEMES[id]);
+  const meme = playful() && res.mood === 'win' && memePair && status === 'done';
   const support = res.mood === 'oops'
     ? (playful() ? `Ouch. ${res.note} Happens to a lot of students, we'll sort it.` : res.note)
     : res.note;
   const body = `
     <div class="mood ${res.mood}">${res.mood === 'win' ? '✅ ' : res.mood === 'oops' ? '😬 ' : '⏳ '}${support}</div>
-    ${meme ? memeHtml(MEMES[id]) : ''}
+    ${meme ? memeHtml(memePair) : ''}
     ${newStamps.map(a => `<div class="newstamp" style="--area:${AREAS[a].color}">${AREAS[a].stamp} <b>${AREAS[a].label}</b> stamp collected!</div>`).join('')}
     ${arrivals.map(a => `<div class="mail">📬 News about <b>${byId(a).title}</b>. Check it on the map.</div>`).join('')}
     ${waitBox}
