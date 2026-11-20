@@ -3,6 +3,7 @@ import { BUDDY, AREAS, PLACES, STEPS, TIPS, TRIPS, PRESETS, MEMES, WHY_CHIPS, UE
 import { CONFIG } from './config.js';
 import { session, log, send, download, continueClock, viewport } from './logger.js';
 import { baseMap, drawMap, drawAvatar, drawTrail, statusText } from './map.js';
+import { initCamera, follow, isPhone } from './camera.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -217,6 +218,8 @@ function mapScreen() {
   $('#btn-end').onclick = confirmEnd;
   $('#btn-costs').onclick = openCosts;
   $('#buddyBtn').onclick = () => { log('buddy_click'); hint(true); };
+  lastFocus = null;
+  initCamera($('#map'), $('.mapwrap'), (type, data) => log(type, data));
   redraw();
 }
 
@@ -263,12 +266,15 @@ function tickChip(sel, label) {
 }
 
 // On narrow screens the map scrolls sideways: keep the next step in view.
-function focusMap() {
-  const wrap = $('.mapwrap'); const svg = $('#map');
-  if (!wrap || wrap.scrollWidth <= wrap.clientWidth + 4) return;
+// Phones: glide to the suggested step whenever the suggestion or your position changes.
+let lastFocus = null;
+function focusMap(force = false) {
+  if (!isPhone() || $('#map')?.classList.contains('viewing-trip')) return;
+  const key = `${s.next}|${s.place}`;
+  if (!force && key === lastFocus) return;
+  lastFocus = key;
   const target = PLACES[(s.next && byId(s.next).place) || s.place];
-  const x = target.x / 1000 * svg.clientWidth - wrap.clientWidth / 2;
-  wrap.scrollTo({ left: Math.max(0, x), behavior: 'smooth' });
+  follow(target.x, target.y);
 }
 
 function areaDone(area) {
@@ -300,7 +306,7 @@ function hint(manual = false) {
 function tutorial() {
   const first = s.next;
   const steps = [
-    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.` },
+    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch or use + and − to zoom, drag to move around.' : ''}` },
     { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
     { sel: '.legend', text: 'Badges tell you the status: done, waiting for someone else, or action needed.' },
     { sel: '.hud', text: 'Keep an eye up here. The calendar moves on with every step. Your budget counts what the exchange costs you, and mistakes add surprises. Each finished area earns you a stamp.' },
@@ -681,20 +687,10 @@ function viewTrip(t) {
   $('#backMine').focus({ preventScroll: true });
 }
 
-// Phones: zoom the map to twice the size around a point (animated viewBox); null resets.
-let zoomAnim;
+// Trip view on phones: follow the selected stop closely; null goes back to your own map.
 function zoomMap(x, y) {
-  const svg = $('#map'); if (!svg) return;
-  const from = svg.getAttribute('viewBox').split(' ').map(Number);
-  const to = x === null ? [0, 0, 1000, 620] : [Math.min(Math.max(x - 250, 0), 500), Math.min(Math.max(y - 155, 0), 310), 500, 310];
-  cancelAnimationFrame(zoomAnim);
-  const t0 = performance.now();
-  const step = now => {
-    const k = Math.min(1, (now - t0) / 350), e = k * (2 - k);
-    svg.setAttribute('viewBox', from.map((v, i) => v + (to[i] - v) * e).join(' '));
-    if (k < 1) zoomAnim = requestAnimationFrame(step);
-  };
-  zoomAnim = requestAnimationFrame(step);
+  if (x === null) { lastFocus = null; return setTimeout(() => focusMap(true), 0); }
+  follow(x, y, 320);
 }
 
 function openCosts() {

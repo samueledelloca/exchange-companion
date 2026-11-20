@@ -114,7 +114,7 @@ main event types are:
 `outcome` (end, mood, simulated day, totalCHF, surpriseCHF), `problem` (id, cause), `cost` (chf, why, kind planned or surprise), `costs_open`, `why`,
 `status_view` (where: status or outcome), `next_step_q`, `next_step_hint` (shown after a no or not sure), `waiting_action`, `tips_open`, `timetable_check`,
 `counter_card`, `quiz` (comprehension check at arrival: selected, correct), `list_open`, `list_pick`, `trips_open`, `trip_view`, `trip_hide`, `meme_shown`,
-`viewport` (orientation change or large resize), `buddy_click`, `buddy_dismiss`, `stamp`, `mail_arrived`, `end` (early, done/total, totalCHF, surpriseCHF, costs, problems with cause, forcedProblems), `share_trip`, `questionnaire`.
+`viewport` (orientation change or large resize), `map_zoom` (how: pinch, doubletap, button_in, button_out), `map_pan`, `map_whole` (phones; at most one per 2 s while gesturing), `buddy_click`, `buddy_dismiss`, `stamp`, `mail_arrived`, `end` (early, done/total, totalCHF, surpriseCHF, costs, problems with cause, forcedProblems), `share_trip`, `questionnaire`.
 
 If the server cannot be reached (for example the page is opened as a file), the thank-you
 screen shows a folded "Save the session file" fallback; otherwise it only closes the story.
