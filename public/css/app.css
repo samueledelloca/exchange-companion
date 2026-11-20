@@ -437,5 +437,8 @@ html, body { overscroll-behavior-y: none; }
 }
 #map .ground { fill: #EEF2F6; }
 @media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
-  #map .ground { fill: #E6ECE0; }
+  /* one continuous ground under the floating bar: same colour as the Lugano land */
+  #map .ground, #map .base { fill: #EDF1E4; }
+  #map .frame { display: none; }
+  .screen.game, .mapwrap { background: #EDF1E4; }
 }

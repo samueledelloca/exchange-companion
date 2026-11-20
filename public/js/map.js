@@ -17,7 +17,7 @@ export function baseMap() {
     </pattern>
   </defs>
   <rect x="-2000" y="-2000" width="5000" height="4620" class="ground"/>
-  <rect x="0" y="0" width="1000" height="620" fill="#EEF2F6"/>
+  <rect class="base" x="0" y="0" width="1000" height="620" fill="#EEF2F6"/>
   <g clip-path="url(#frame)">
     <rect x="230" y="18" width="762" height="584" fill="#EDF1E4"/>
     <!-- relief: San Salvatore, Monte Brè and the Boglia slopes -->
