@@ -551,3 +551,12 @@ button.chip.role:hover { border-color: var(--accent); }
 .tlegend .ln.next { border-top: 5px dashed #F2B705; }
 .tlegend .ln.done { border-top-color: var(--win); }
 .tlegend .b { flex: none; }
+/* richer train scene */
+.ar-train .seg { transform-box: view-box; transform-origin: 500px 300px; opacity: 0; animation: arRing 1.8s linear infinite; }
+.ar-train .streaks line { stroke-dasharray: 40 320; animation: arStreak .5s linear infinite; }
+@keyframes arStreak { from { stroke-dashoffset: 360; } to { stroke-dashoffset: 0; } }
+.ar-train .ar-land { transform-box: view-box; transform-origin: 500px 330px; transform: scale(1.14); animation: arForward 2.6s 2.5s ease-out forwards; }
+@keyframes arForward { to { transform: scale(1); } }
+.arrival .shimmer { animation: arShimmer 3s ease-in-out infinite alternate; }
+@keyframes arShimmer { to { transform: translateX(24px); } }
+.arrival.still .ar-land { transform: none; }

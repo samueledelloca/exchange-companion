@@ -8,14 +8,23 @@ const SCENES = {
     caption: ['Through the Gotthard Base Tunnel, 57 km under the Alps…', 'Benvenuti in Ticino!'],
     svg: () => `
       <defs>
-        <linearGradient id="arSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FC4EA"/><stop offset="1" stop-color="#E9F3F9"/></linearGradient>
-        <radialGradient id="arGlow"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#FFF6D6"/><stop offset="1" stop-color="#FFF6D6" stop-opacity="0"/></radialGradient>
+        ${skyDefs()}
+        <radialGradient id="arGlow"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#FFF6D6"/><stop offset="1" stop-color="#FFF6D6" stop-opacity="0"/></radialGradient>
+        <radialGradient id="arWall" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#030406"/><stop offset=".35" stop-color="#0B0E13"/><stop offset="1" stop-color="#232933"/></radialGradient>
+        <radialGradient id="arLamp"><stop offset="0" stop-color="#FFE7A3"/><stop offset=".4" stop-color="#FFC857" stop-opacity=".8"/><stop offset="1" stop-color="#FFC857" stop-opacity="0"/></radialGradient>
       </defs>
       <g class="ar-land">${landscape()}</g>
       <g class="ar-tunnel">
-        <rect x="-500" y="-500" width="2000" height="1600" fill="#0E1116"/>
-        ${[0, 1, 2, 3, 4, 5].map(i => `<g class="ring" style="animation-delay:${i * 0.33}s"><ellipse cx="500" cy="300" rx="260" ry="210" fill="none" stroke="#3A4150" stroke-width="14"/><circle cx="270" cy="230" r="5" fill="#FFD36A"/><circle cx="730" cy="230" r="5" fill="#FFD36A"/></g>`).join('')}
-        <circle class="portal" cx="500" cy="300" r="40" fill="url(#arGlow)"/>
+        <rect x="-500" y="-500" width="2000" height="1600" fill="url(#arWall)"/>
+        <g class="streaks" stroke="#fff" stroke-opacity=".09" stroke-width="2" stroke-linecap="round">
+          ${Array.from({ length: 16 }, (_, i) => { const a = i / 16 * Math.PI * 2; return `<line x1="${500 + Math.cos(a) * 60}" y1="${300 + Math.sin(a) * 50}" x2="${500 + Math.cos(a) * 900}" y2="${300 + Math.sin(a) * 700}" style="animation-delay:${(i % 4) * 0.12}s"/>`; }).join('')}
+        </g>
+        <path d="M494 300 L300 720 M506 300 L700 720" stroke="#59606C" stroke-width="5"/>
+        ${[0, 1, 2, 3, 4, 5, 6].map(i => `<g class="seg" style="animation-delay:${(i * 0.26).toFixed(2)}s">
+          <path d="M335 560 L335 330 A165 175 0 0 1 665 330 L665 560" fill="none" stroke="#353C48" stroke-width="12"/>
+          <line x1="350" y1="560" x2="650" y2="560" stroke="#4A515E" stroke-width="9"/>
+          <circle cx="352" cy="352" r="18" fill="url(#arLamp)"/><circle cx="648" cy="352" r="18" fill="url(#arLamp)"/></g>`).join('')}
+        <circle class="portal" cx="500" cy="300" r="34" fill="url(#arGlow)"/>
       </g>`,
   },
   flight: {
@@ -41,7 +50,7 @@ const SCENES = {
     caption: ['Down the Tremola, the old road over the Gotthard Pass…', 'Benvenuti in Ticino!'],
     svg: () => `
       <defs><linearGradient id="arSky3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9CCBEB"/><stop offset="1" stop-color="#EEF6FA"/></linearGradient>
-        <linearGradient id="arSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FC4EA"/><stop offset="1" stop-color="#E9F3F9"/></linearGradient></defs>
+        ${skyDefs()}</defs>
       <g class="ar-pan">
         <rect x="-500" y="-500" width="2000" height="2600" fill="url(#arSky3)"/>
         <path d="M-200 520 L120 120 L260 260 L420 40 L620 300 L760 140 L1200 560 V1500 H-200 Z" fill="#9DB48F"/>
@@ -62,16 +71,37 @@ function cloud(x, y, k) {
   return `<g transform="translate(${x} ${y}) scale(${k})" fill="#fff" opacity=".96"><ellipse cx="0" cy="0" rx="90" ry="38"/><ellipse cx="-55" cy="12" rx="55" ry="28"/><ellipse cx="60" cy="10" rx="60" ry="30"/><ellipse cx="10" cy="-26" rx="50" ry="30"/></g>`;
 }
 
-// the view that opens up when you reach Ticino: mountains, the lake, a palm
+function skyDefs() {
+  return `<linearGradient id="arSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6FB0E3"/><stop offset=".75" stop-color="#CFE6F4"/><stop offset="1" stop-color="#F6EEDC"/></linearGradient>
+    <linearGradient id="arLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E9FCF"/><stop offset="1" stop-color="#8DC3E6"/></linearGradient>
+    <radialGradient id="arSun"><stop offset="0" stop-color="#FFF8DC"/><stop offset=".5" stop-color="#FFE9A8" stop-opacity=".7"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>`;
+}
+
+// the view that opens up when you reach Ticino: the lake, San Salvatore's cone,
+// Monte Brè, a lakeside village with red roofs and a bell tower, palms
 function landscape() {
+  const houses = [[300, 22, 18], [328, 18, 22], [352, 26, 16], [384, 20, 20], [520, 24, 18], [552, 18, 24], [580, 26, 17], [612, 20, 21], [640, 22, 16]]
+    .map(([x, w, h]) => `<rect x="${x}" y="${428 - h}" width="${w}" height="${h}" fill="#F1E6D2"/><path d="M${x - 2} ${428 - h} L${x + w / 2} ${428 - h - 9} L${x + w + 2} ${428 - h} Z" fill="#C2553A"/><rect x="${x + w / 2 - 2}" y="${428 - h / 2}" width="4" height="5" fill="#7A8794"/>`).join('');
+  const palm = (x, y, k) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M0 0 q3 -40 -2 -78" stroke="#7A6A4F" stroke-width="7" fill="none"/><path d="M-2 -78 q-36 -10 -54 14 M-2 -78 q36 -12 54 12 M-2 -78 q-16 -32 -44 -32 M-2 -78 q16 -32 44 -30 M-2 -78 q-2 -30 6 -44" stroke="#3F8A45" stroke-width="7" fill="none" stroke-linecap="round"/></g>`;
   return `
     <rect x="-500" y="-80" width="2000" height="760" fill="url(#arSky)"/>
-    <path d="M-200 360 L120 150 L260 250 L430 110 L600 260 L780 140 L1200 380 V700 H-200 Z" fill="#A8BF9C"/>
-    <path d="M400 135 L430 110 L462 138 L438 132 Z M752 160 L780 140 L812 162 Z" fill="#fff" opacity=".9"/>
-    <path d="M-200 420 L200 300 L520 400 L860 290 L1200 430 V700 H-200 Z" fill="#8FAE82"/>
-    <path d="M-200 470 C200 430 500 500 1200 455 V800 H-200 Z" fill="#7DB4DA"/>
-    <g stroke="#fff" stroke-opacity=".6" stroke-width="3" fill="none" stroke-linecap="round"><path d="M200 520 q16 -8 32 0 t32 0"/><path d="M640 560 q16 -8 32 0 t32 0"/></g>
-    <g transform="translate(860 470)"><path d="M0 0 v-70" stroke="#7A6A4F" stroke-width="6"/><path d="M0 -70 q-34 -10 -50 14 M0 -70 q34 -10 50 14 M0 -70 q-14 -30 -40 -30 M0 -70 q14 -30 40 -30" stroke="#4E9A4E" stroke-width="6" fill="none" stroke-linecap="round"/></g>`;
+    <circle cx="790" cy="120" r="90" fill="url(#arSun)"/>
+    ${cloud(180, 90, .45)}${cloud(600, 60, .35)}
+    <path d="M-200 330 L40 220 L160 260 L300 170 L420 240 L560 150 L700 230 L860 160 L1200 300 V460 H-200 Z" fill="#B9CCD9"/>
+    <path d="M290 175 L300 170 L314 178 Z M550 156 L560 150 L574 160 Z M850 166 L860 160 L873 168 Z" fill="#fff"/>
+    <path d="M-200 400 L60 330 L180 360 L320 300 L460 350 L600 290 L760 330 L960 270 L1200 330 V480 H-200 Z" fill="#9DB591"/>
+    <path d="M110 430 L235 225 L250 222 L370 430 Z" fill="#86A57A"/>
+    <path d="M760 430 C800 330 880 280 960 290 C1040 300 1120 360 1200 380 V440 Z" fill="#8FAE82"/>
+    <path d="M-200 422 C100 414 400 432 1200 418 V470 H-200 Z" fill="#8FAE82"/>
+    ${houses}
+    <rect x="466" y="372" width="14" height="56" fill="#E8DCC4"/><path d="M462 372 L473 344 L484 372 Z" fill="#9A4A33"/><circle cx="473" cy="388" r="3" fill="#7A8794"/>
+    <path d="M-200 432 C100 426 500 440 1200 428 V800 H-200 Z" fill="url(#arLake)"/>
+    <path d="M150 436 L240 560 L330 436 Z" fill="#86A57A" opacity=".18"/>
+    <g class="shimmer" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M120 480 q16 -7 32 0 t32 0"/><path d="M420 500 q16 -7 32 0 t32 0"/><path d="M700 470 q16 -7 32 0 t32 0"/><path d="M260 560 q16 -7 32 0 t32 0"/><path d="M620 580 q16 -7 32 0 t32 0"/>
+    </g>
+    <rect x="-200" y="560" width="1400" height="60" fill="#D9CDB4"/><rect x="-200" y="556" width="1400" height="6" fill="#B8AC93"/>
+    ${palm(880, 580, 1.15)}${palm(960, 590, .9)}${palm(90, 585, 1)}`;
 }
 
 export function playArrival(mode = 'train') {

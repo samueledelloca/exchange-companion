@@ -455,6 +455,15 @@ function tipsHtml(key) {
 
 function renderScene(id, sceneId) {
   const st = byId(id);
+  // the journey: right after choosing how to travel, the arrival scene plays and
+  // Lugano opens; only then does the panel ask what you do first
+  if (id === 'arrive' && sceneId === 'arrived' && !s.flags.arrivalShown) {
+    s.flags.arrivalShown = true; s.holdFog = true; saveGame();
+    return playArrival(s.flags.travelMode).then(() => {
+      s.holdFog = false; log('lugano_unlocked', { mode: s.flags.travelMode, day: s.day });
+      redraw(); renderScene(id, sceneId);
+    });
+  }
   let sc = st.scenes[sceneId](ctx);
   if (sc.redirect) { sceneId = sc.redirect; sc = st.scenes[sceneId](ctx); }
   current = { id, scene: sceneId };
@@ -591,14 +600,7 @@ function finishStep(id, res) {
   newStamps.forEach(a => log('stamp', { area: a }));
   if (st.final) { redraw(); return endScreen(false); }
   // arriving: a short scene for the way you travelled, then Lugano opens
-  const arrivalStamps = id === 'arrive' && status === 'done' ? newStamps : [];
-  if (id === 'arrive' && status === 'done') {
-    s.holdFog = true;
-    setTimeout(() => playArrival(s.flags.travelMode).then(() => {
-      s.holdFog = false; log('lugano_unlocked', { mode: s.flags.travelMode, day: s.day }); redraw();
-      if (arrivalStamps.length) setTimeout(() => celebrate(arrivalStamps), 900);
-    }), 150);
-  }
+
   const passed = dayAtOpen === null ? 0 : s.day - dayAtOpen;
   dayAtOpen = null;
   const paid = s.costs.slice(costsAtOpen ?? s.costs.length);
@@ -635,7 +637,7 @@ function finishStep(id, res) {
   if (waitBox) wireMicroq(id, s.statusStyle[id] || 'rich', 'outcome');
   if (meme) log('meme_shown', { step: id });
   redraw();
-  if (newStamps.length && id !== 'arrive') celebrate(newStamps);
+  if (newStamps.length) celebrate(newStamps);
 }
 
 // A full-screen stamp moment when an area is completed.
