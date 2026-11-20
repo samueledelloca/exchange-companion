@@ -1,5 +1,5 @@
-// Phone map camera: pinch to zoom, drag to move, double-tap to zoom in, + / - and
-// "Whole map" buttons, and a glide to the suggested step after each step.
+// Phone map camera: pinch to zoom, drag to move, double-tap to zoom in, and a
+// glide to the suggested step after each step (no on-screen buttons: standard gestures).
 // It works on the SVG viewBox, so the map stays sharp at every zoom.
 // On wider screens it does nothing and the map keeps its fixed view.
 
@@ -132,18 +132,6 @@ function up(e) {
   }
 }
 
-function buttons(host) {
-  const box = document.createElement('div');
-  box.className = 'mapctl';
-  box.innerHTML = `<div class="ctlgrp"><button class="ctl" data-z="in" aria-label="Zoom in" title="Zoom in">+</button>
-    <button class="ctl" data-z="out" aria-label="Zoom out" title="Zoom out">−</button></div>
-    <button class="ctl" data-z="whole" aria-label="Show the whole map" title="Whole map"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
-  host.appendChild(box);
-  box.querySelector('[data-z="in"]').onclick = () => { glide({ ...cam, h: cam.h * 0.65 }, 250); onLog('map_zoom', { how: 'button_in' }); };
-  box.querySelector('[data-z="out"]').onclick = () => { glide({ ...cam, h: cam.h / 0.65 }, 250); onLog('map_zoom', { how: 'button_out' }); };
-  box.querySelector('[data-z="whole"]').onclick = () => { glide({ cx: MAP_W / 2, cy: MAP_H / 2, h: hWhole() }); onLog('map_whole', {}); };
-}
-
 export function initCamera(el, host, log) {
   svg = el; onLog = log || onLog;
   cam = { cx: MAP_W / 2, cy: MAP_H / 2, h: H_FOLLOW };
@@ -155,7 +143,6 @@ export function initCamera(el, host, log) {
   svg.addEventListener('click', e => { if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; } }, true);
   window.addEventListener('resize', () => apply());
   if (window.ResizeObserver) new ResizeObserver(() => apply()).observe(svg);
-  buttons(host);
   apply();
 }
 

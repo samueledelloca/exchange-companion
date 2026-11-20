@@ -307,7 +307,7 @@ function hint(manual = false) {
 function tutorial() {
   const first = s.next;
   const steps = [
-    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch or use + and − to zoom, drag to move around.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
+    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch to zoom and drag to move around, like any map.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
     { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
     { sel: '.legend', text: 'Badges tell you the status: done, waiting for someone else, or action needed.' },
     { sel: '.hud', text: 'Keep an eye up here. The calendar moves on with every step. Your budget counts what the exchange costs you, and mistakes add surprises. Each finished area earns you a stamp.' },
