@@ -23,6 +23,7 @@ Python 3 only, no install; sessions go to `data/`. Useful URL parameters:
 | `?tips=named` or `anon` | force the tips variant (signed by a past student vs anonymous) |
 | `?seed=42` | replay the same random events (USI Home lottery, landlord replies, recognition) |
 | `?debug=1` | show the assigned variant at the top |
+| `?demo=arrival&mode=train` (or `flight`, `car`) | jump straight to the arrival scene, as Jonas with everything before departure done; nothing is recorded |
 
 ## Files
 

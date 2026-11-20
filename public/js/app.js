@@ -951,5 +951,27 @@ function resumeScreen(prev, log0) {
 
 let savedLog = null;
 try { savedLog = JSON.parse(sessionStorage.getItem('ec-log') || 'null'); } catch (e) { savedLog = null; }
-if (saved?.s?.consent && saved.s.profile && !(savedLog && savedLog.sent)) resumeScreen(saved, savedLog);
+// Demo shortcut for the team: ?demo=arrival&mode=train|flight|car jumps straight
+// to the arrival scene (everything before departure already done). Nothing is
+// recorded: no consent, so nothing is ever sent.
+function demoArrival(mode) {
+  try { sessionStorage.removeItem(SAVE_KEY); sessionStorage.removeItem('ec-log'); } catch (e) { /* ignore */ }
+  session.round = 'demo';
+  const p = PRESETS.find(x => x.id === 'jonas');
+  s.profile = { preset: p.id, name: p.name, flag: p.flag, origin: p.origin, visa: false, stay: p.stay, abroad: p.abroad };
+  for (const id of ['accounts', 'usihome', 'roomhunt', 'courses']) s.steps[id] = { status: 'done' };
+  s.steps.recognition = { status: 'waiting' }; s.waits.recognition = 2;
+  Object.assign(s.flags, { savedCreds: true, housing: 'sublet', ownerLetter: true, courses: ['daf', 'ie', 'dm'], travelMode: mode,
+    travelNote: { train: 'Six hours of mountains and tunnels, right on time.', flight: 'Cheap flight, bus on time. Lucky you.', car: 'Your family carries the boxes and leaves you a full fridge.' }[mode] });
+  s.day = -16; s.place = 'roomsearch';
+  s.costs.push({ chf: 1400, why: 'Sublet: deposit and first month', kind: 'planned', day: -20 });
+  refresh();
+  mapScreen();
+  openStep('arrive');
+  renderScene('arrive', 'arrived');   // plays the arrival scene first
+}
+
+const demo = params.get('demo');
+if (demo === 'arrival') demoArrival(['train', 'flight', 'car'].includes(params.get('mode')) ? params.get('mode') : 'train');
+else if (saved?.s?.consent && saved.s.profile && !(savedLog && savedLog.sent)) resumeScreen(saved, savedLog);
 else intro();
