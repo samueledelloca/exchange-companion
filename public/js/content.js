@@ -29,6 +29,7 @@ export const PLACES = {
   homeuni:   { x: 232, y: 480, label: 'Home university',  icon: '🏫' },
   station:   { x: 356, y: 340, label: 'Lugano station',     icon: '🚉' },
   campus:    { x: 560, y: 214, label: 'USI campus',         icon: '🎓' },
+  office:    { x: 680, y: 196, label: 'International office', icon: '🤝' },
   municipio: { x: 522, y: 422, label: 'Punto Città',        icon: '🏛️' },
   canton:    { x: 360, y: 462, label: 'Cantonal office',    icon: '🪪' },
   post:      { x: 432, y: 398, label: 'Post office',        icon: '📮' },
@@ -52,6 +53,7 @@ export const TIPS = {
   usihome:  [{ who: 'Lena', when: 'Fall 2025', text: 'Registering interest is not applying. Put the real opening date in your calendar.' }],
   roomhunt: [{ who: 'Tomás', when: 'Spring 2026', text: 'Never pay a deposit before a viewing, even a video one.' },
              { who: 'Lena', when: 'Fall 2025', text: 'Ask outgoing USI students: many sublet their room for exactly one semester.' }],
+  welcome:  [{ who: 'Ana', when: 'Spring 2026', text: 'Go to the welcome day. Half of what I needed to know was on one slide.' }],
   register: [{ who: 'Jakob', when: 'Fall 2025', text: 'If you sublet, Punto Città also wants a letter from the owner. I learned it at the counter.' }],
   permit:   [{ who: 'Ana', when: 'Spring 2026', text: 'Silence is normal. Mine took five weeks and then a letter just appeared.' }],
   insurance:[{ who: 'Jakob', when: 'Fall 2025', text: 'The exemption goes by post. Do it in week one or you will forget it.' }],
@@ -72,6 +74,7 @@ export const TRIPS = [
       ['roomhunt', 'win', 'Found a sublet in Viganello from an outgoing student.'],
       ['courses', 'win', 'Learning agreement sent, no clashes.'],
       ['arrive', 'win', 'Train through the Gotthard.'],
+      ['welcome', 'win', 'Welcome day: USI card, and the tip about the 8-day deadline.'],
       ['register', 'oops', 'Sent back: the owner\'s letter was missing.'],
       ['register', 'win', 'Came back with the letter. Registered.'],
       ['permit', 'meh', 'Submitted the form, then four weeks of silence.'],
@@ -91,6 +94,7 @@ export const TRIPS = [
       ['courses', 'oops', 'Two courses on Tuesday at 10:30. Changed the plan.'],
       ['visa', 'win', 'Visa collected.'],
       ['arrive', 'win', 'Flight to Zurich, then the train.'],
+      ['welcome', 'win', 'Welcome day at the International office. Met half of her future friends.'],
       ['register', 'win', 'Used the checklist. Registered at the first try.'],
       ['insurance', 'win', 'Compared three student insurances, bought one online.'],
       ['permit', 'meh', 'Submitted. Six procedures running at once.'],
@@ -109,9 +113,10 @@ export const TRIPS = [
       ['usihome', 'oops', 'Applied on time, but no room was left.'],
       ['roomhunt', 'meh', 'A listing asked for a deposit before any viewing. Walked away.'],
       ['roomhunt', 'win', 'One-year lease in Molino Nuovo, right for a full year.'],
-      ['arrive', 'win', 'Drove down with family.'],
-      ['register', 'win', 'Registered at the first try.'],
       ['courses', 'win', 'Study plan sent.'],
+      ['arrive', 'win', 'Drove down with family.'],
+      ['welcome', 'meh', 'Skipped the welcome day: "I have done this before."'],
+      ['register', 'win', 'Registered at the first try.'],
       ['permit', 'meh', 'Submitted, then waited.'],
       ['insurance', 'oops', 'Postponed the exemption letter. Posted it just in time.'],
       ['transport', 'oops', 'Cheapest ticket, wrong zone: about 80 CHF of surcharge and fare.'],
@@ -135,6 +140,7 @@ export const PRESETS = [
 // Buddy lines. "win" after a good outcome, "oops" after a problem (support, no
 // jokes), "meme" = caption pair for the playful variant.
 export const MEMES = {
+  welcome:   ['Me: "I will remember the deadlines"', 'The slide: 8 DAYS. IN CAPITALS.'],
   accounts:  ['USI: "your username is shown only once"', 'Me: screenshots it 4 times'],
   usihome:   ['When you apply the minute it opens', 'and the room is actually yours'],
   roomhunt:  ['12 messages sent', '1 landlord replied. A legend.'],
@@ -292,7 +298,8 @@ export const STEPS = [
   },
   {
     id: 'arrive', area: 'prep', place: 'station', title: 'Travel to Lugano', mandatory: true,
-    requires: ['accounts', 'usihome', 'visa'],
+    // the bridge between the two zones: Lugano opens once everything before departure is done
+    requires: ['accounts', 'visa', 'usihome', 'roomhunt', 'courses'],
     scenes: {
       start: c => ({
         text: `Bags packed. ${c.s.flags.housing ? 'Your room in Lugano is waiting.' : 'You still have no room in Lugano.'} How do you get there?`,
@@ -565,8 +572,26 @@ export const STEPS = [
     },
   },
   {
-    id: 'social', area: 'everyday', place: 'lake', title: 'Meet other students', mandatory: false,
+    id: 'welcome', area: 'study', place: 'office', title: 'Welcome day for exchange students', mandatory: true,
     requires: ['arrive'],
+    scenes: {
+      start: () => ({
+        text: 'The International office runs a welcome day for new exchange students: your USI card, a tour of the campus and a session on permits and deadlines. It starts at 9:00.',
+        why: true,
+        choices: [
+          { id: 'go', label: 'Go to the welcome day', go: c => { c.days(1); c.set('welcomeDay', true); return 'day'; } },
+          { id: 'skip', label: 'Skip it and sleep in', go: c => { c.days(1); c.set('welcomeDay', false); return { end: 'done', mood: 'meh', note: 'You sleep in. You will pick up the USI card later, and the deadlines you will have to find out yourself.' }; } },
+        ],
+      }),
+      day: () => ({
+        text: 'You get your USI card and a folder. The session ends with a slide in big letters: <b>register at Punto Città within 8 days, then apply for the permit online within 14</b>. The student association invites everyone to an aperitivo at the lake.',
+        choices: [{ id: 'ok', label: 'Got it', go: () => ({ end: 'done', mood: 'win', note: 'USI card in your pocket, the deadlines in your notes, and some new faces.' }) }],
+      }),
+    },
+  },
+  {
+    id: 'social', area: 'everyday', place: 'lake', title: 'Meet other students', mandatory: false,
+    requires: ['welcome'],
     scenes: {
       start: () => ({
         text: 'The student association organises a welcome aperitivo at the lakefront tonight.',
@@ -586,7 +611,7 @@ export const STEPS = [
   },
   {
     id: 'settled', area: 'everyday', place: 'viewpoint', title: 'Final stop: Monte Brè', mandatory: false, final: true,
-    requires: ['permit', 'insurance', 'recognition', 'transport', 'surprise'],
+    requires: ['permit', 'insurance', 'recognition', 'transport', 'surprise', 'welcome'],
     scenes: {
       start: c => {
         const left = c.left();

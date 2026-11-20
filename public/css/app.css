@@ -493,3 +493,15 @@ button.chip.role:hover { border-color: var(--accent); }
 .homemark .hlabel { font: 700 11px 'Plus Jakarta Sans', sans-serif; fill: #8A4A2E; paint-order: stroke; stroke: #EDF1E4; stroke-width: 3px; }
 .homemark .hnote { font: 600 9.5px 'Plus Jakarta Sans', sans-serif; fill: #6F7A8C; paint-order: stroke; stroke: #EDF1E4; stroke-width: 3px; }
 #map.viewing-trip #homes { opacity: .28; }
+
+/* two zones: Lugano is fogged and locked until everything before departure is done */
+#map .fog { fill: #EEF1F5; opacity: 0; pointer-events: none; transition: opacity 1s ease; }
+#map.lugano-locked .fog { opacity: .6; }
+#map .node.away { transition: opacity .8s ease, filter .8s ease; }
+#map.lugano-locked .node.away { opacity: .5; filter: grayscale(1); }
+#map.lugano-locked #homes { opacity: .45; }
+#map #lock { opacity: 0; pointer-events: none; transition: opacity .8s ease; }
+#map.lugano-locked #lock { opacity: 1; }
+#map #lock rect { fill: rgba(23, 32, 49, .82); }
+#map #lock text { fill: #fff; font: 700 15px 'Plus Jakarta Sans', sans-serif; }
+.why-own .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }

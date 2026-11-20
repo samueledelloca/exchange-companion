@@ -44,11 +44,16 @@ export function baseMap() {
   <text x="158" y="588" class="maplabel soft" text-anchor="middle">before departure</text>
   <!-- the journey from home -->
   <path d="M304 300 C318 310 326 318 334 326" stroke="#7D838D" stroke-width="2.5" stroke-dasharray="2 6" fill="none" stroke-linecap="round"/>
+  <rect class="fog" x="304" y="-2000" width="3000" height="5000"/>
   <g id="homes"></g>
   <g id="edges"></g>
   <g id="trail"></g>
   <g id="nodes"></g>
-  <g id="avatar"></g>`;
+  <g id="avatar"></g>
+  <g id="lock" transform="translate(650 470)" aria-hidden="true">
+    <rect x="-190" y="-26" width="380" height="52" rx="26"/>
+    <text text-anchor="middle" y="6">🔒 Lugano opens when you are ready to travel</text>
+  </g>`;
 }
 
 function el(tag, attrs = {}, text) {
@@ -60,7 +65,13 @@ function el(tag, attrs = {}, text) {
 
 const BADGE = { done: '✓', waiting: '⏳', action: '!', later: '!', locked: '🔒' };
 
+const LUGANO_X = 304;  // right edge of the Home zone
+
 export function drawMap(svg, steps, state, visible, onOpen) {
+  // Lugano stays locked (fogged) until the trip there can start
+  const arrive = state.steps.arrive?.status;
+  const locked = !arrive || arrive === 'locked';
+  svg.classList.toggle('lugano-locked', locked);
   const edges = svg.querySelector('#edges');
   const nodes = svg.querySelector('#nodes');
   edges.innerHTML = ''; nodes.innerHTML = '';
@@ -101,7 +112,7 @@ export function drawMap(svg, steps, state, visible, onOpen) {
     const status = state.steps[st.id]?.status || 'locked';
     const area = AREAS[st.area];
     const g = el('g', {
-      class: `node ${status}${state.next === st.id ? ' next' : ''}`, transform: `translate(${p.x} ${p.y})`,
+      class: `node ${status}${state.next === st.id ? ' next' : ''}${p.x > LUGANO_X && st.id !== 'arrive' ? ' away' : ''}`, transform: `translate(${p.x} ${p.y})`,
       tabindex: status === 'locked' ? '-1' : '0', role: 'button', 'data-step': st.id,
       'aria-label': `${st.title}, ${area.label}, ${statusText(status)}`,
     });

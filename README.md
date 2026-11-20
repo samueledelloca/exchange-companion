@@ -57,7 +57,11 @@ the class session.**
 
 ## What is tested
 
-- **Map and paths.** Dependencies made visible (no address, no registration).
+- **Map and paths.** Dependencies made visible (no address, no registration). Two zones:
+  Home (everything before departure, online or with the home university) and Lugano (in
+  person). Lugano stays fogged and locked until every pre-departure step is done; travelling
+  is the bridge (event `lugano_unlocked`). After arrival, a welcome day at the International
+  office (attend or skip) leads to the welcome aperitivo.
 - **Personalisation.** Three personas from Report 1, or a custom student (EU or not,
   semester or year, first time abroad or not). Non-EU students get the visa step (unless they choose
   the no-visa option, e.g. Singapore) and no insurance exemption. Students who lived abroad skip one tutorial card.

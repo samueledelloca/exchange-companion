@@ -252,6 +252,12 @@ function redraw() {
   saveGame();
   const svg = $('#map');
   drawMap(svg, STEPS, s, visible, openStep);
+  const locked = svg.classList.contains('lugano-locked');
+  if (wasLocked === true && !locked) {
+    log('lugano_unlocked', { day: s.day });
+    setTimeout(() => say(`🎉 <b>Lugano is open!</b> Everything before departure is done. Time to travel: the train is waiting at the station.`, 9000), 700);
+  }
+  wasLocked = locked;
   drawAvatar(svg, s.place, s.profile.flag);
   focusMap();
   $('#week').textContent = weekLabel();
@@ -271,6 +277,7 @@ function redraw() {
 // Make the passing of simulated time visible: the calendar chip flashes and
 // shows how much time went by.
 let shownDay = null;
+let wasLocked = null;
 let shownCost = null;
 const shownStamps = new Set();
 const fmtDays = n => n >= 7 ? `${Math.round(n / 7)} week${Math.round(n / 7) > 1 ? 's' : ''}` : `${n} day${n > 1 ? 's' : ''}`;
@@ -329,7 +336,7 @@ function tutorial() {
     { sel: '.chip.role', text: s.profile.preset === 'custom'
         ? 'You are now playing the student you made. Decide as you think they would. You can always see who you play up here.'
         : `You are <b>${s.profile.name}</b> now: ${(PRESETS.find(p => p.id === s.profile.preset)?.blurb || '').replace(/^./, c => c.toLowerCase())} Decide as you think ${s.profile.name} would. You can always see who you play up here.` },
-    { sel: '#map', text: `This is your exchange, as a map. Home is on the left, Lugano and its lake on the right. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch to zoom and drag to move around, like any map.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
+    { sel: '#map', text: `This is your exchange, as a map. Home is on the left: everything before departure. Lugano, on the right, opens once that is done and you can travel. Your trip ends on Monte Brè, the mountain by the lake, once you are settled in.${isPhone() ? ' Pinch to zoom and drag to move around, like any map.' : ''}${isPhone() && innerHeight > innerWidth ? ' Tip: turn your phone sideways for a wider map.' : ''}` },
     { sel: `[data-step="${first}"]`, text: 'The place marked <b>Suggested</b> is what I would do next. Places with a soft halo and a light blue path are open too: do them in any order you like. Locked places open when the steps before them are done, just like in real life: no address, no registration.' },
     { id: 'legend', sel: isPhone() ? '#btn-legend' : '.legend', text: isPhone()
         ? 'Paths: <b>gold</b> is my suggestion, <b>blue</b> is also open now, <b>green</b> is done. Badges on places: ✓ done, ⏳ waiting for someone else, ! action needed, 🔒 locked. Tap <b>?</b> any time to see this again.'
@@ -545,7 +552,12 @@ function askWhy(st, choice, cont) {
   panel.querySelector('.choices').replaceWith(box);
   const done = answer => { log('why', { step: st.id, choice: choice.id, answer }); cont(); };
   box.querySelectorAll('[data-w]').forEach(b => b.onclick = () => done(WHY_CHIPS[b.dataset.w]));
-  $('#whyOk').onclick = () => done($('#whyTxt').value.trim() || null);
+  // Send only with some text: empty answers go through Skip
+  const ok = $('#whyOk'), txt = $('#whyTxt');
+  ok.disabled = true;
+  txt.oninput = () => { ok.disabled = !txt.value.trim(); };
+  txt.onkeydown = e => { if (e.key === 'Enter' && txt.value.trim()) done(txt.value.trim()); };
+  ok.onclick = () => { if (txt.value.trim()) done(txt.value.trim()); };
   $('#whySkip').onclick = () => done(null);
   box.querySelector('.chipbtn').focus();
 }
