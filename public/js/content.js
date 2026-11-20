@@ -305,16 +305,16 @@ export const STEPS = [
         text: `Bags packed. ${c.s.flags.housing ? 'Your room in Lugano is waiting.' : 'You still have no room in Lugano.'} How do you get there?`,
         why: true,
         choices: c.s.profile.origin === 'eu' ? [
-          { id: 'train', label: 'Direct train through the Gotthard (about 130 CHF)', go: c => { c.spend(130, 'Train to Lugano'); c.days(1); c.set('travelNote', 'Six hours of mountains and tunnels, right on time.'); return 'arrived'; } },
-          { id: 'flight', label: 'Cheapest flight to Milan, then the bus (about 110 CHF)', go: c => {
+          { id: 'train', label: 'Direct train through the Gotthard (about 130 CHF)', go: c => { c.set('travelMode', 'train'); c.spend(130, 'Train to Lugano'); c.days(1); c.set('travelNote', 'Six hours of mountains and tunnels, right on time.'); return 'arrived'; } },
+          { id: 'flight', label: 'Cheapest flight to Milan, then the bus (about 110 CHF)', go: c => { c.set('travelMode', 'flight');
               c.spend(110, 'Flight and bus to Lugano'); c.days(1);
               if (c.rng() < 0.5) { c.cost(160, 'Taxi from Milan after a missed bus'); c.problem('missed-bus', 'random'); c.set('travelNote', 'The flight lands late and the last bus to Lugano has gone. Taxi: 160 CHF.'); }
               else c.set('travelNote', 'Cheap flight, bus on time. Lucky you.');
               return 'arrived'; } },
-          { id: 'car', label: 'Drive down with family (fuel and vignette, about 90 CHF)', go: c => { c.spend(90, 'Fuel and motorway vignette'); c.days(1); c.set('travelNote', 'Your family carries the boxes and leaves you a full fridge.'); return 'arrived'; } },
+          { id: 'car', label: 'Drive down with family (fuel and vignette, about 90 CHF)', go: c => { c.set('travelMode', 'car'); c.spend(90, 'Fuel and motorway vignette'); c.days(1); c.set('travelNote', 'Your family carries the boxes and leaves you a full fridge.'); return 'arrived'; } },
         ] : [
-          { id: 'zurich', label: 'Long-haul flight to Zurich, then the train (about 950 CHF)', go: c => { c.spend(950, 'Flight to Zurich and train to Lugano'); c.days(1); c.set('travelNote', 'Thirteen hours in the air and three on the train. Tired, but on time.'); return 'arrived'; } },
-          { id: 'milan', label: 'Cheaper long-haul flight to Milan, then the bus (about 800 CHF)', go: c => {
+          { id: 'zurich', label: 'Long-haul flight to Zurich, then the train (about 950 CHF)', go: c => { c.set('travelMode', 'flight'); c.spend(950, 'Flight to Zurich and train to Lugano'); c.days(1); c.set('travelNote', 'Thirteen hours in the air and three on the train. Tired, but on time.'); return 'arrived'; } },
+          { id: 'milan', label: 'Cheaper long-haul flight to Milan, then the bus (about 800 CHF)', go: c => { c.set('travelMode', 'flight');
               c.spend(800, 'Flight to Milan and bus to Lugano'); c.days(1);
               if (c.rng() < 0.5) { c.cost(160, 'Taxi from Milan after a missed bus'); c.problem('missed-bus', 'random'); c.set('travelNote', 'The flight lands late and the last bus to Lugano has gone. Taxi: 160 CHF.'); }
               else c.set('travelNote', 'Long flight, bus on time. Lucky you.');
@@ -344,6 +344,24 @@ export const STEPS = [
             ? 'Exactly. Register at Punto Città within 8 days, then start the residence permit online within 14 days.'
             : 'The one with the 8-day deadline is the registration at Punto Città. Then the residence permit, online, within 14 days. The rest can wait.', right ? 'win' : 'meh');
         },
+      }),
+    },
+  },
+  {
+    id: 'welcome', area: 'study', place: 'office', title: 'Welcome day for exchange students', mandatory: true,
+    requires: ['arrive'],
+    scenes: {
+      start: () => ({
+        text: 'The International office runs a welcome day for new exchange students: your USI card, a tour of the campus and a session on permits and deadlines. It starts at 9:00.',
+        why: true,
+        choices: [
+          { id: 'go', label: 'Go to the welcome day', go: c => { c.days(1); c.set('welcomeDay', true); return 'day'; } },
+          { id: 'skip', label: 'Skip it and sleep in', go: c => { c.days(1); c.set('welcomeDay', false); return { end: 'done', mood: 'meh', note: 'You sleep in. You will pick up the USI card later, and the deadlines you will have to find out yourself.' }; } },
+        ],
+      }),
+      day: () => ({
+        text: 'You get your USI card and a folder. The session ends with a slide in big letters: <b>register at Punto Città within 8 days, then apply for the permit online within 14</b>. The student association invites everyone to an aperitivo at the lake.',
+        choices: [{ id: 'ok', label: 'Got it', go: () => ({ end: 'done', mood: 'win', note: 'USI card in your pocket, the deadlines in your notes, and some new faces.' }) }],
       }),
     },
   },
@@ -568,24 +586,6 @@ export const STEPS = [
           { id: 'ignore', label: 'Ignore it, it must be a mistake', go: c => { serafe(c); c.cost(20, 'Serafe reminder fee'); c.problem('ignored-bill'); return { end: 'done', mood: 'oops', note: 'A reminder arrives with a fee. It was not a mistake: the fee is per household, TV or not.' }; } },
           { id: 'guide', label: 'Look it up in the companion\'s money guide', go: c => { const paid = serafe(c); return { end: 'done', mood: paid ? 'meh' : 'win', note: paid ? `It is per household, TV or not. ${c.s.flags.housing === 'lease' ? 'The flat is yours, so the bill is too.' : 'You split it with your flatmates.'}` : 'USI Home counts as a collective household: the residence pays, not you.' }; } },
         ],
-      }),
-    },
-  },
-  {
-    id: 'welcome', area: 'study', place: 'office', title: 'Welcome day for exchange students', mandatory: true,
-    requires: ['arrive'],
-    scenes: {
-      start: () => ({
-        text: 'The International office runs a welcome day for new exchange students: your USI card, a tour of the campus and a session on permits and deadlines. It starts at 9:00.',
-        why: true,
-        choices: [
-          { id: 'go', label: 'Go to the welcome day', go: c => { c.days(1); c.set('welcomeDay', true); return 'day'; } },
-          { id: 'skip', label: 'Skip it and sleep in', go: c => { c.days(1); c.set('welcomeDay', false); return { end: 'done', mood: 'meh', note: 'You sleep in. You will pick up the USI card later, and the deadlines you will have to find out yourself.' }; } },
-        ],
-      }),
-      day: () => ({
-        text: 'You get your USI card and a folder. The session ends with a slide in big letters: <b>register at Punto Città within 8 days, then apply for the permit online within 14</b>. The student association invites everyone to an aperitivo at the lake.',
-        choices: [{ id: 'ok', label: 'Got it', go: () => ({ end: 'done', mood: 'win', note: 'USI card in your pocket, the deadlines in your notes, and some new faces.' }) }],
       }),
     },
   },

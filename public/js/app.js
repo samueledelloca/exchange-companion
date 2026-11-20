@@ -4,6 +4,7 @@ import { CONFIG } from './config.js';
 import { session, log, send, download, continueClock, viewport } from './logger.js';
 import { baseMap, drawMap, drawAvatar, drawTrail, statusText } from './map.js';
 import { initCamera, follow, settle, deskReveal, isPhone } from './camera.js';
+import { playArrival } from './arrival.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -252,12 +253,13 @@ function redraw() {
   saveGame();
   const svg = $('#map');
   drawMap(svg, STEPS, s, visible, openStep);
-  const locked = svg.classList.contains('lugano-locked');
-  if (wasLocked === true && !locked) {
-    log('lugano_unlocked', { day: s.day });
-    setTimeout(() => say(`🎉 <b>Lugano is open!</b> Everything before departure is done. Time to travel: the train is waiting at the station.`, 9000), 700);
+  // the moment everything before departure is done: travelling becomes possible
+  const ready = s.steps.arrive?.status === 'open';
+  if (wasLocked === false && ready) {
+    log('ready_to_travel', { day: s.day });
+    setTimeout(() => say(`🧳 <b>Everything before departure is done.</b> Time to travel: Lugano is waiting, start at the station.`, 9000), 700);
   }
-  wasLocked = locked;
+  wasLocked = !ready && s.steps.arrive?.status !== 'done' ? false : true;
   drawAvatar(svg, s.place, s.profile.flag);
   focusMap();
   $('#week').textContent = weekLabel();
@@ -588,6 +590,15 @@ function finishStep(id, res) {
   const newStamps = after.filter(a => !before.includes(a));
   newStamps.forEach(a => log('stamp', { area: a }));
   if (st.final) { redraw(); return endScreen(false); }
+  // arriving: a short scene for the way you travelled, then Lugano opens
+  const arrivalStamps = id === 'arrive' && status === 'done' ? newStamps : [];
+  if (id === 'arrive' && status === 'done') {
+    s.holdFog = true;
+    setTimeout(() => playArrival(s.flags.travelMode).then(() => {
+      s.holdFog = false; log('lugano_unlocked', { mode: s.flags.travelMode, day: s.day }); redraw();
+      if (arrivalStamps.length) setTimeout(() => celebrate(arrivalStamps), 900);
+    }), 150);
+  }
   const passed = dayAtOpen === null ? 0 : s.day - dayAtOpen;
   dayAtOpen = null;
   const paid = s.costs.slice(costsAtOpen ?? s.costs.length);
@@ -624,7 +635,7 @@ function finishStep(id, res) {
   if (waitBox) wireMicroq(id, s.statusStyle[id] || 'rich', 'outcome');
   if (meme) log('meme_shown', { step: id });
   redraw();
-  if (newStamps.length) celebrate(newStamps);
+  if (newStamps.length && id !== 'arrive') celebrate(newStamps);
 }
 
 // A full-screen stamp moment when an area is completed.
@@ -919,6 +930,7 @@ function resumeScreen(prev, log0) {
     <div class="actions center"><button class="btn primary" id="resume">Continue where I left off</button><button class="btn ghost" id="restart">Start over</button></div></main>`, 'center');
   $('#resume').onclick = () => {
     Object.assign(s, prev.s);
+    s.holdFog = false;
     if (log0) { Object.assign(session, log0, { sent: false }); continueClock(log0.events.at(-1)?.t || 0); }
     // replay the dice so the rest of the run stays the same as before the reload
     while (rngCalls < prev.rngCalls) rng();

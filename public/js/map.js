@@ -69,9 +69,12 @@ const LUGANO_X = 304;  // right edge of the Home zone
 
 export function drawMap(svg, steps, state, visible, onOpen) {
   // Lugano stays locked (fogged) until the trip there can start
+  // Lugano opens when you arrive (after the arrival scene); before that it is fogged
   const arrive = state.steps.arrive?.status;
-  const locked = !arrive || arrive === 'locked';
+  const locked = arrive !== 'done' || !!state.holdFog;
   svg.classList.toggle('lugano-locked', locked);
+  const sign = svg.querySelector('#lock text');
+  if (sign) sign.textContent = arrive === 'locked' || !arrive ? '🔒 Lugano opens when you are ready to travel' : '🚆 Ready to travel: start at the station';
   const edges = svg.querySelector('#edges');
   const nodes = svg.querySelector('#nodes');
   edges.innerHTML = ''; nodes.innerHTML = '';
