@@ -51,7 +51,12 @@ for r in sessions:
     row = {
         'id': r.get('id'), 'code': r.get('code', ''), 'round': r.get('round', ''), 'version': r.get('version', ''),
         'started_at': r.get('startedAt', ''), 'last_saved': r.get('_server_time', ''),
-        'device': r.get('userAgent', ''), 'screen_size': r.get('screen', ''),
+        'device': (r.get('device') or {}).get('class', r.get('userAgent', '')), 'screen_size': r.get('screen', ''),
+        'os': (r.get('device') or {}).get('os', ''), 'browser': (r.get('device') or {}).get('browser', ''),
+        'touch': (r.get('device') or {}).get('touch', ''), 'dpr': (r.get('device') or {}).get('dpr', ''),
+        'orientation_start': ((r.get('device') or {}).get('start') or {}).get('orientation', ''),
+        'viewport_end': '{w}x{h}'.format(**end['viewport']) if end.get('viewport') else '',
+        'orientation_changes': sum(e['type'] == 'viewport' for e in ev),
         'buddy': v.get('buddy', ''), 'tips': v.get('tips', ''), 'seed': v.get('seed', ''),
         'status_style': json.dumps(v.get('statusStyle', {})),
         'persona': prof.get('preset', ''), 'origin': prof.get('origin', ''), 'stay': prof.get('stay', ''), 'abroad_before': prof.get('abroad', ''),

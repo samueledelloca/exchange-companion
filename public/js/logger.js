@@ -6,6 +6,27 @@ let t0 = performance.now();
 // After a resume, keep event times growing from where the previous page stopped.
 export function continueClock(lastT) { t0 = performance.now() - lastT - 1000; }
 
+// Coarse device profile for interpreting results (no full user-agent string,
+// nothing precise enough to fingerprint a device).
+export function viewport() {
+  return { w: window.innerWidth, h: window.innerHeight, orientation: window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait' };
+}
+function deviceProfile() {
+  const ua = navigator.userAgent;
+  const touch = (navigator.maxTouchPoints || 0) > 0;
+  const coarse = window.matchMedia?.('(pointer: coarse)').matches || false;
+  const ipadOS = /Macintosh/.test(ua) && touch;          // iPads report themselves as Macs
+  const os = /iPhone|iPod/.test(ua) ? 'iOS' : /iPad/.test(ua) || ipadOS ? 'iPadOS' : /Android/.test(ua) ? 'Android'
+    : /Windows/.test(ua) ? 'Windows' : /Mac OS X|Macintosh/.test(ua) ? 'macOS' : /Linux|CrOS/.test(ua) ? 'Linux' : 'other';
+  const browser = /SamsungBrowser/.test(ua) ? 'Samsung' : /EdgA?\//.test(ua) ? 'Edge' : /CriOS|Chrome\//.test(ua) ? 'Chrome'
+    : /FxiOS|Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'other';
+  const shortSide = Math.min(screen.width, screen.height);
+  const cls = (os === 'iPadOS' || (os === 'Android' && !/Mobile/.test(ua))) ? 'tablet'
+    : (coarse && shortSide < 600) || /Mobi|iPhone/.test(ua) ? 'phone' : 'desktop';
+  return { class: cls, os, browser, touch, pointer: coarse ? 'coarse' : 'fine',
+    dpr: Math.round((window.devicePixelRatio || 1) * 10) / 10, start: viewport() };
+}
+
 // Short participant code, shown to the participant so they can ask to withdraw.
 // No 0/O/1/I to avoid misreading.
 function shortCode() {
@@ -21,6 +42,7 @@ export const session = {
   startedAt: new Date().toISOString(),
   userAgent: navigator.userAgent.includes('Mobi') ? 'mobile' : 'desktop',
   screen: `${window.innerWidth}x${window.innerHeight}`,
+  device: deviceProfile(),
   variant: {},
   events: [],
   answers: null,

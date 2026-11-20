@@ -1,7 +1,7 @@
 // Exchange Companion: game engine, screens, buddy, logging hooks.
 import { BUDDY, AREAS, PLACES, STEPS, TIPS, TRIPS, PRESETS, MEMES, WHY_CHIPS, UEQS, TAILORED } from './content.js';
 import { CONFIG } from './config.js';
-import { session, log, send, download, continueClock } from './logger.js';
+import { session, log, send, download, continueClock, viewport } from './logger.js';
 import { baseMap, drawMap, drawAvatar, drawTrail, statusText } from './map.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -732,7 +732,8 @@ function endScreen(early) {
   s.finished = true;
   const vis = STEPS.filter(visible);
   const done = vis.filter(st => s.steps[st.id].status === 'done').length;
-  log('end', { early, done, total: vis.length, day: s.day, totalCHF: total(), surpriseCHF: extra(), costs: s.costs, problems: s.problems, forcedProblems: s.problems.filter(p => p.cause === 'forced').length, counterVisits: s.counters.counterVisits || 0 });
+  session.device && (session.device.end = viewport());
+  log('end', { early, viewport: viewport(), done, total: vis.length, day: s.day, totalCHF: total(), surpriseCHF: extra(), costs: s.costs, problems: s.problems, forcedProblems: s.problems.filter(p => p.cause === 'forced').length, counterVisits: s.counters.counterVisits || 0 });
   document.querySelector('.tour')?.remove();
   screen(`
     <main class="card-screen wide endscr">
@@ -807,6 +808,16 @@ function thanks(sent) {
       <button class="btn ghost small" id="dl">Save the session file</button></details>`}</main>`, 'center');
   if (!sent) $('#dl').onclick = download;
 }
+
+// orientation changes and big resizes during the game, for interpretation
+let lastVp = viewport(), vpTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(vpTimer);
+  vpTimer = setTimeout(() => {
+    const v = viewport();
+    if (s.consent && (v.orientation !== lastVp.orientation || Math.abs(v.w - lastVp.w) > 100)) { log('viewport', v); lastVp = v; }
+  }, 600);
+});
 
 // partial logs when the participant closes the page mid-way
 let lastBeacon = 0;

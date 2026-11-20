@@ -106,7 +106,7 @@ and `data/all.jsonl`; online, the snapshots go to D1 and `scripts/export.sh` wri
 same `data/all.jsonl`. **Keep the last snapshot per `id`.** Nothing is sent before consent.
 No IP address and no name are stored.
 
-A snapshot contains `id`, `code` (the short participant code shown to them, for withdrawal requests: see `DEPLOY.md`), `round`, `version`, `startedAt`, `variant` (buddy, tips, seed,
+A snapshot contains `device` (class phone/tablet/desktop, os, browser family, touch, pointer, pixel ratio, viewport and orientation at start and end; no full user-agent string), `id`, `code` (the short participant code shown to them, for withdrawal requests: see `DEPLOY.md`), `round`, `version`, `startedAt`, `variant` (buddy, tips, seed,
 statusStyle), `events` (type, `t` in ms since load, and details) and `answers`. The
 main event types are:
 
@@ -114,7 +114,7 @@ main event types are:
 `outcome` (end, mood, simulated day, totalCHF, surpriseCHF), `problem` (id, cause), `cost` (chf, why, kind planned or surprise), `costs_open`, `why`,
 `status_view` (where: status or outcome), `next_step_q`, `next_step_hint` (shown after a no or not sure), `waiting_action`, `tips_open`, `timetable_check`,
 `counter_card`, `quiz` (comprehension check at arrival: selected, correct), `list_open`, `list_pick`, `trips_open`, `trip_view`, `trip_hide`, `meme_shown`,
-`buddy_click`, `buddy_dismiss`, `stamp`, `mail_arrived`, `end` (early, done/total, totalCHF, surpriseCHF, costs, problems with cause, forcedProblems), `share_trip`, `questionnaire`.
+`viewport` (orientation change or large resize), `buddy_click`, `buddy_dismiss`, `stamp`, `mail_arrived`, `end` (early, done/total, totalCHF, surpriseCHF, costs, problems with cause, forcedProblems), `share_trip`, `questionnaire`.
 
 If the server cannot be reached (for example the page is opened as a file), the thank-you
 screen shows a folded "Save the session file" fallback; otherwise it only closes the story.
