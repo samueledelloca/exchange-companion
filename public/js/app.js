@@ -3,7 +3,7 @@ import { BUDDY, AREAS, PLACES, STEPS, TIPS, TRIPS, PRESETS, MEMES, WHY_CHIPS, UE
 import { CONFIG } from './config.js';
 import { session, log, send, download, continueClock, viewport } from './logger.js';
 import { baseMap, drawMap, drawAvatar, drawTrail, statusText } from './map.js';
-import { initCamera, follow, settle, isPhone } from './camera.js';
+import { initCamera, follow, settle, deskReveal, isPhone } from './camera.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -396,7 +396,7 @@ function openStep(id) {
   const panel = $('#panel'); panel.hidden = false;
   panel.style.setProperty('--area', AREAS[st.area].color);
   // phones: show the place in the part of the map the panel leaves visible
-  if (isPhone()) setTimeout(() => follow(PLACES[st.place].x, PLACES[st.place].y), 60);
+  setTimeout(() => (isPhone() ? follow : deskReveal)(PLACES[st.place].x, PLACES[st.place].y), 60);
   if (status === 'locked') {
     const miss = st.requires.filter(r => !satisfied(r)).map(r => byId(r).title);
     panelHtml(st, `<p>This path is still closed. First:</p><ul class="plain">${miss.map(m => `<li>${m}</li>`).join('')}</ul>`, [], 'locked');

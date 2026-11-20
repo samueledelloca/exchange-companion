@@ -409,13 +409,10 @@ html, body { overscroll-behavior-y: none; }
   .cele-card { padding: 16px 24px; } .cele-stamp { width: 84px; height: 84px; font-size: 2.4rem; }
 }
 
-/* desktop: while a panel is open the map shrinks into the space left of it */
+/* desktop: the legend moves beside an open panel (the map slides, see camera.js) */
 @media (min-width: 721px) {
-  .mapwrap { transition: padding-right .25s ease; }
-  .screen.game:has(.panel:not([hidden])) .mapwrap { padding-right: calc(min(420px, 100% - 32px) + 24px); }
-}
-@media (max-height: 500px) and (pointer: coarse) and (min-width: 721px) {
-  .screen.game:has(.panel:not([hidden])) .mapwrap { padding-right: 0; }
+  .legend { transition: right .25s ease; }
+  .screen.game:has(.panel:not([hidden])) .legend { right: calc(min(420px, 100% - 32px) + 32px); }
 }
 
 /* immersive map on phones: the map fills the screen, the rest floats over it */

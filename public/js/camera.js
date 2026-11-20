@@ -8,6 +8,7 @@ const H_MIN = 200;          // most zoomed in: 200 map units tall
 const H_FOLLOW = 540;       // the zoom used when following a step: the step and its neighbours
 
 let svg = null, cam = null, anim = 0, onLog = () => {};
+let deskX = 0, deskAnim = 0;   // desktop: horizontal shift of the full map while a panel is open
 const pts = new Map();
 let gesture = null, dragged = false, lastTap = 0, logTimer = 0, pendingLog = null;
 
@@ -52,7 +53,7 @@ function clamp(c) {
 
 function apply() {
   if (!svg) return;
-  if (!isPhone()) { svg.setAttribute('viewBox', `0 0 ${MAP_W} ${MAP_H}`); return; }
+  if (!isPhone()) { svg.setAttribute('viewBox', `${deskX} 0 ${MAP_W} ${MAP_H}`); return; }
   cam = clamp(cam);
   const w = cam.h * aspect();
   svg.setAttribute('viewBox', `${cam.cx - w / 2} ${cam.cy - cam.h / 2} ${w} ${cam.h}`);
@@ -158,6 +159,30 @@ export function follow(x, y, h = H_FOLLOW) {
 }
 
 // After a panel closes: slide back inside the map if the view hung under the panel.
-export function settle() { if (svg && isPhone()) glide({ ...cam }, 300); }
+export function settle() { if (!svg) return; if (isPhone()) glide({ ...cam }, 300); else deskReveal(null); }
 
 export function whole() { if (svg && isPhone()) glide({ cx: MAP_W / 2, cy: MAP_H / 2, h: hWhole() }); }
+
+// Desktop: keep the map at full size; if an open panel would cover the place,
+// slide the map left just enough to show it beside the panel (the map continues
+// past its old edge, so nothing empty comes into view). null slides back.
+export function deskReveal(x) {
+  if (!svg || isPhone()) return;
+  let target = 0;
+  const p = document.querySelector('#panel');
+  if (x !== null && p && !p.hidden) {
+    const r = svg.getBoundingClientRect();
+    const scale = Math.min(r.width / MAP_W, r.height / MAP_H);
+    const left = r.left + (r.width - MAP_W * scale) / 2;
+    const visibleRight = p.getBoundingClientRect().left - 70;
+    target = Math.min(Math.max(0, (left + x * scale - visibleRight) / scale), 520);
+  }
+  cancelAnimationFrame(deskAnim);
+  const from = deskX, t0 = performance.now();
+  const step = now => {
+    const k = Math.min(1, (now - t0) / 350), e = 1 - Math.pow(1 - k, 3);
+    deskX = from + (target - from) * e; apply();
+    if (k < 1) deskAnim = requestAnimationFrame(step);
+  };
+  deskAnim = requestAnimationFrame(step);
+}
