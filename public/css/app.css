@@ -354,3 +354,23 @@ textarea { display: block; width: 100%; margin-top: 6px; font: inherit; border: 
   .trip-panel .area-chip { font-size: .75rem; }
 }
 @media (min-width: 721px) { .tl-hint { display: none; } }
+
+/* questionnaire: about you */
+.about label { display: grid; grid-template-columns: minmax(150px, 1fr) 1.4fr; gap: 10px; align-items: center; min-height: 48px; }
+.about select { font: inherit; padding: 9px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); min-height: 44px; width: 100%; }
+@media (max-width: 720px) { .about label { grid-template-columns: 1fr; gap: 4px; } }
+
+/* contrast: surfaces must stand apart from the background */
+:root { --bg: #E7ECF3; --line: #CDD5E1; }
+.card-screen, .modal-card, .cele-card { border: 1px solid #C9D2DF; box-shadow: 0 10px 34px rgba(23, 32, 49, .16); }
+.panel { border: 1px solid #C9D2DF; box-shadow: 0 14px 48px rgba(23, 32, 49, .32); }
+.btn.choice { box-shadow: inset 0 0 0 1.5px #BFC9D8; }
+.opt, .steprow, .trip, .preset { border-color: #BFC9D8; }
+.mood, .statusbox, .paid, .timepass, .tips, .mail { border: 1px solid rgba(23, 32, 49, .08); }
+@media (max-width: 720px) {
+  .panel { border-top-width: 6px; box-shadow: 0 -10px 40px rgba(23, 32, 49, .38); }
+  .panel::before { content: ''; display: block; width: 44px; height: 5px; border-radius: 3px; background: #C3CBD8; margin: -6px auto 8px; }
+  .screen.game:has(.panel:not([hidden]):not(.trip-panel)) .mapwrap { filter: brightness(.72) saturate(.85); transition: filter .2s; }
+  .tour-card { border: 1px solid #C9D2DF; }
+}
+.panel { border-top: 6px solid var(--area, var(--accent)); }

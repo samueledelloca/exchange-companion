@@ -88,7 +88,8 @@ open answers.
 UEQ-S (8 items, 7-point; first four pragmatic, last four hedonic), six tailored
 5-point items (map, next step, companion pleasant, jokes got in the way (playful only),
 costs realistic, others' trips useful), two open questions, and a screener (exchange student now, in the
-past, student, other). We also sample up to three "why did you choose that?" prompts
+past, student, other), plus optional background questions in broad categories (age range,
+region where they grew up, occupation, field). We also sample up to three "why did you choose that?" prompts
 per run, after choices with several reasonable options.
 
 ## Data
@@ -105,7 +106,7 @@ main event types are:
 
 `consent`, `profile`, `tutorial` (skipped, ms), `open_step`, `choice`, `multi`,
 `outcome` (end, mood, simulated day, totalCHF, surpriseCHF), `problem` (id, cause), `cost` (chf, why, kind planned or surprise), `costs_open`, `why`,
-`status_view`, `next_step_q`, `waiting_action`, `tips_open`, `timetable_check`,
+`status_view` (where: status or outcome), `next_step_q`, `next_step_hint` (shown after a no or not sure), `waiting_action`, `tips_open`, `timetable_check`,
 `counter_card`, `quiz` (comprehension check at arrival: selected, correct), `list_open`, `list_pick`, `trips_open`, `trip_view`, `trip_hide`, `meme_shown`,
 `buddy_click`, `buddy_dismiss`, `stamp`, `mail_arrived`, `end` (early, done/total, totalCHF, surpriseCHF, costs, problems with cause, forcedProblems), `share_trip`, `questionnaire`.
 

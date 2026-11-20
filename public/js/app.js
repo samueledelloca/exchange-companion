@@ -97,7 +97,8 @@ function consent() {
       <h1>What we record</h1>
       <ul class="plain">
         <li>What you click, the choices you make and how long each step takes.</li>
-        <li>Your answers to a short questionnaire at the end.</li>
+        <li>Now and then, why you chose something (always optional).</li>
+        <li>Your answers to a short questionnaire at the end, with a few optional questions about you in broad categories (age range, region, field).</li>
         <li>No name, no email, nothing that identifies you.</li>
         <li>You can stop at any moment, just close the page.</li>
       </ul>
@@ -458,10 +459,7 @@ function renderStatus(st, sc) {
     <div id="reply"></div>`,
     [...sc.actions.map(a => `<button class="btn choice" data-a="${a.id}">${a.label}</button>`), '<button class="btn ghost" id="backMap">Back to the map</button>'], 'waiting');
   trackTips(st.id);
-  document.querySelectorAll('#microq [data-q]').forEach(b => b.onclick = () => {
-    log('next_step_q', { step: st.id, style, answer: b.dataset.q });
-    $('#microq').innerHTML = '<p class="muted">Thanks!</p>';
-  });
+  wireMicroq(st.id, style, 'status');
   document.querySelectorAll('#panel [data-a]').forEach(b => b.onclick = () => {
     const a = sc.actions.find(x => x.id === b.dataset.a);
     log('waiting_action', { step: st.id, action: a.id, style });
@@ -473,12 +471,27 @@ function renderStatus(st, sc) {
   $('#backMap').onclick = closePanel;
 }
 
+// "Do you know what to do next?" The answer is logged first (that is the measure),
+// then a "no" or "not sure" gets a concrete hint instead of a bare thank-you.
+function wireMicroq(stepId, style, where) {
+  document.querySelectorAll('#microq [data-q]').forEach(b => b.onclick = () => {
+    const box = $('#microq'), answer = b.dataset.q;
+    log('next_step_q', { step: stepId, style, answer, where });
+    refresh();
+    const nx = s.next && s.next !== stepId ? byId(s.next) : null;
+    box.innerHTML = answer === 'yes'
+      ? '<p class="muted">Great. Carry on with your other steps.</p>'
+      : `<p class="reply">💡 Nothing to do here for now: this one is in someone else's hands and they will answer on their own, usually within a few weeks. Carry on with other steps${nx ? `, for example <b>${nx.title}</b>` : ''}. I will tell you as soon as news arrives.</p>`;
+    if (answer !== 'yes') log('next_step_hint', { step: stepId, style, where });
+  });
+}
+
 function askWhy(st, choice, cont) {
   s.why++;
   const panel = $('#panel');
   const box = document.createElement('div');
   box.className = 'why';
-  box.innerHTML = `<p><b>Quick one:</b> why "${choice.label.toLowerCase()}"?</p>
+  box.innerHTML = `<p><b>A quick question for our study</b> (optional): why did you choose "${choice.label.toLowerCase()}"? There is no right answer. It helps us understand how people decide.</p>
     <div class="chips">${WHY_CHIPS.map((w, i) => `<button class="chipbtn" data-w="${i}">${w}</button>`).join('')}</div>
     <div class="why-own"><label for="whyTxt" class="sr-only">Your own words</label><input id="whyTxt" placeholder="Or in your own words (optional)" maxlength="200"><button class="btn small" id="whyOk">Send</button></div>
     <button class="btn-link" id="whySkip">Skip</button>`;
@@ -549,11 +562,7 @@ function finishStep(id, res) {
     '<button class="btn ghost" id="backMap">Back to the map</button>'], status, 'outcome');
   if (nx) $('#goNext').onclick = () => { log('go_next', { from: id, to: nx.id }); openStep(nx.id); redraw(); };
   $('#backMap').onclick = closePanel;
-  document.querySelectorAll('#microq [data-q]').forEach(b => b.onclick = () => {
-    const box = $('#microq');
-    log('next_step_q', { step: box.dataset.step, style: box.dataset.style, answer: b.dataset.q, where: 'outcome' });
-    box.innerHTML = '<p class="muted">Thanks!</p>';
-  });
+  if (waitBox) wireMicroq(id, s.statusStyle[id] || 'rich', 'outcome');
   if (meme) log('meme_shown', { step: id });
   redraw();
   if (newStamps.length) celebrate(newStamps);
@@ -740,6 +749,12 @@ function questionnaire() {
           <label><input type="radio" name="screen" value="exchange-past"> Yes, in the past</label>
           <label><input type="radio" name="screen" value="student"> No, but I am or was a student</label>
           <label><input type="radio" name="screen" value="other"> No</label></fieldset>
+        <fieldset class="about"><legend>About you (optional)</legend>
+          <label>Age range <select name="age"><option value="">Choose</option>${['18–24', '25–34', '35–44', '45–54', '55 or older', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
+          <label>Where did you mostly grow up? <select name="region"><option value="">Choose</option>${['Switzerland', 'Italy', 'Germany, Austria', 'France, Benelux', 'Other Western Europe', 'Eastern Europe', 'Latin America', 'North America', 'Asia', 'Middle East, North Africa', 'Sub-Saharan Africa', 'Oceania', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
+          <label>What do you do? <select name="occupation"><option value="">Choose</option>${['Student', 'Working', 'Studying and working', 'Other', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
+          <label>Field of study or work <select name="field"><option value="">Choose</option>${['Informatics, engineering', 'Economics, business, finance', 'Communication, media', 'Design, architecture, arts', 'Humanities, social sciences, education', 'Natural sciences, health, medicine', 'Law, political science', 'Other', 'Prefer not to say'].map(v => `<option>${v}</option>`).join('')}</select></label>
+        </fieldset>
         <fieldset class="ueq"><legend>The app was... (pick a point between each pair)</legend>
           ${UEQS.map(([l, r], i) => `<div class="sd" role="radiogroup" aria-label="${l} to ${r}"><span>${l}</span><div class="pts">${[1, 2, 3, 4, 5, 6, 7].map(v => `<label><input type="radio" name="ueq${i}" value="${v}" required><span class="sr-only">${v}</span></label>`).join('')}</div><span>${r}</span></div>`).join('')}
         </fieldset>
